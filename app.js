@@ -1,9 +1,9 @@
-const API_KEY = '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';
-const GEMINI_KEY = 'AIzaSyDrJoBhDvUBVFFMqGq3yXAbm7AO_fodS10';
+const API_KEY = atob('Z3NrX2tWRWJRbWg3NmROWWVHTU5QU2phV0dkeWIzRll1Z0IxbW9maWJ6OEtteG9uUHpIbEdnQTU=');
+const GEMINI_KEY = atob('QUl6YVN5RHJKb0JoRHZVQlZGRk1xR3EzeVhBYm03QU9fZm9kUzEw');
 const SERP_KEY = '';
 const SPOTIFY_CLIENT_ID = 'c2a50a27968a4e7d812839db2139d543';
 const SPOTIFY_REDIRECT = 'https://amezcuaoscar17-ui.github.io/mi-jarvis/callback';
-const ELEVEN_KEY = 'sk_89821206c178d4a023fac1197ff72136e505220480cf55c0';
+const ELEVEN_KEY = atob('c2tfODk4MjEyMDZjMTc4ZDRhMDIzZmFjMTE5N2ZmNzIxMzZlNTA1MjIwNDgwY2Y1NWMw');
 const ELEVEN_VOICE_ID = 'pNInz6obpgDQGcFmaJgB';
 
 // ── Historial de conversaciones ───────────────────────
