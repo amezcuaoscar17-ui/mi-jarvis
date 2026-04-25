@@ -449,7 +449,7 @@ async function intercambiarCodigoSpotify() {
     console.log('Spotify token response:', data);
 
     if (data.access_token) {
-      localStorage.setItem('spotify-token', data.access_token);
+      localStorage.setItem('spotify-token', data.access_token); actualizarStatusSpotify(); actualizarStatusElevenLabs();
       localStorage.setItem('spotify-token-time', Date.now());
       localStorage.removeItem('spotify-code');
       localStorage.removeItem('spotify_verifier');
@@ -1452,7 +1452,7 @@ if (chatInput) chatInput.addEventListener('keydown', async (e) => { if (e.key ==
 if (btnCam) btnCam.addEventListener('click', async () => {
   if (cameraOn) {
     stream.getTracks().forEach(t => t.stop());
-    if (camPreview) camPreview.classList.remove('visible');
+    if (camPreview) { camPreview.classList.remove('visible'); camPreview.style.display = 'none'; }
     btnCam.classList.remove('active');
     if (btnCapture) btnCapture.style.display = 'none';
     cameraOn = false;
@@ -1462,7 +1462,7 @@ if (btnCam) btnCam.addEventListener('click', async () => {
       stream = await navigator.mediaDevices.getUserMedia({ video: true });
       if (camPreview) camPreview.srcObject = stream;
       await new Promise(resolve => setTimeout(resolve, 1500));
-      if (camPreview) camPreview.classList.add('visible');
+      if (camPreview) { camPreview.classList.add('visible'); camPreview.style.display = 'block'; }
       btnCam.classList.add('active');
       if (btnCapture) btnCapture.style.display = 'inline-block';
       cameraOn = true;
@@ -1851,6 +1851,13 @@ let usoMensajes = parseInt(localStorage.getItem('uso-mensajes-hoy') || '0');
 let usoImagenes = parseInt(localStorage.getItem('uso-imagenes-hoy') || '0');
 let usoBusquedas = parseInt(localStorage.getItem('uso-busquedas-hoy') || '0');
 
+function actualizarStatusElevenLabs() {
+  const el = document.getElementById('status-eleven');
+  if (!el) return;
+  el.textContent = '● Conectado';
+  el.className = 'integracion-status connected';
+}
+
 function actualizarStatusSpotify() {
   const el = document.getElementById('status-spotify');
   if (!el) return;
@@ -1982,6 +1989,6 @@ window.addEventListener('load', async () => {
 
   renderizarTareas();
   actualizarUso();
-  actualizarStatusSpotify();
+  actualizarStatusSpotify(); actualizarStatusElevenLabs();
   await speak(saludo);
 });
