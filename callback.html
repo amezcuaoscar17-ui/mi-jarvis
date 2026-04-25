@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Conectando Spotify...</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0a0a0f;
+      color: #e0e8ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    p { font-size: 16px; color: #7090cc; text-align: center; }
+    .ok { color: #1DB954; font-size: 24px; }
+    .error { color: #ff6b6b; }
+  </style>
+</head>
+<body>
+  <p id="msg">Conectando con Spotify...</p>
+  <script>
+    const searchParams = new URLSearchParams(window.location.search);
+    const code = searchParams.get('code');
+    const error = searchParams.get('error');
+
+    if (error) {
+      document.getElementById('msg').innerHTML = '<span class="error">Error: ' + error + '</span>';
+    } else if (code) {
+      localStorage.setItem('spotify-code', code);
+      localStorage.setItem('spotify-code-time', Date.now());
+      document.getElementById('msg').innerHTML = '<span class="ok">✓ Spotify conectado.</span><br><p>Regresando a Jarvis...</p>';
+      setTimeout(() => {
+        window.location.href = '/mi-jarvis/';
+      }, 1500);
+    } else {
+      document.getElementById('msg').textContent = 'No se recibió código.';
+    }
+  </script>
+</body>
+</html>

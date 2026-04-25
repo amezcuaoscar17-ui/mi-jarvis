@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jarvis</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@300;400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- Boot screen -->
+  <div id="boot-screen">
+    <div id="boot-content">
+      <div id="boot-logo">J</div>
+      <div id="boot-title">JARVIS</div>
+      <div id="boot-subtitle">JUST A RATHER VERY INTELLIGENT SYSTEM</div>
+      <div id="boot-lines"></div>
+      <div id="boot-bar-wrap"><div id="boot-bar"></div></div>
+      <div id="boot-status">INITIALIZING...</div>
+    </div>
+  </div>
+
+  <!-- Onda de audio -->
+  <canvas id="wave-canvas"></canvas>
+
+  <!-- App principal -->
+  <div id="app">
+
+    <!-- Sidebar -->
+    <aside id="sidebar">
+      <div id="sidebar-logo">
+        <div id="sidebar-logo-icon">J</div>
+        <span id="sidebar-logo-text">JARVIS</span>
+      </div>
+
+      <nav id="sidebar-nav">
+        <div class="nav-item active" data-section="inicio">
+          <span class="nav-icon">⌂</span>
+          <span class="nav-label">Inicio</span>
+        </div>
+        <div class="nav-item" data-section="chat">
+          <span class="nav-icon">◈</span>
+          <span class="nav-label">Chat</span>
+        </div>
+        <div class="nav-item" data-section="vision">
+          <span class="nav-icon">◎</span>
+          <span class="nav-label">Visión</span>
+        </div>
+        <div class="nav-item" data-section="documentos">
+          <span class="nav-icon">▤</span>
+          <span class="nav-label">Documentos</span>
+        </div>
+        <div class="nav-item" data-section="imagenes">
+          <span class="nav-icon">◻</span>
+          <span class="nav-label">Imágenes</span>
+        </div>
+        <div class="nav-item" data-section="musica">
+          <span class="nav-icon">♪</span>
+          <span class="nav-label">Música</span>
+        </div>
+        <div class="nav-item" data-section="tareas">
+          <span class="nav-icon">✓</span>
+          <span class="nav-label">Tareas</span>
+        </div>
+        <div class="nav-item" data-section="memoria">
+          <span class="nav-icon">◉</span>
+          <span class="nav-label">Memoria</span>
+        </div>
+        <div class="nav-item" data-section="ajustes">
+          <span class="nav-icon">◈</span>
+          <span class="nav-label">Ajustes</span>
+        </div>
+      </nav>
+
+      <div id="sidebar-user">
+        <div id="sidebar-user-avatar">O</div>
+        <div id="sidebar-user-info">
+          <div id="sidebar-user-name">Óscar</div>
+          <div id="sidebar-user-plan">Premium</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Área principal -->
+    <main id="main">
+
+      <!-- Topbar -->
+      <div id="topbar">
+        <div id="topbar-left">
+          <button id="sidebar-toggle">☰</button>
+        </div>
+        <div id="topbar-right">
+          <button id="btn-search-top">⌕</button>
+          <button id="btn-notif">🔔</button>
+          <button id="btn-config" title="Ajustes">[ SYS ]</button>
+        </div>
+      </div>
+
+      <!-- Secciones -->
+      <div id="sections">
+
+        <!-- INICIO -->
+        <section id="sec-inicio" class="section active">
+          <div id="inicio-header">
+            <div id="inicio-greeting">Hola, <span id="greeting-name">Óscar</span>.</div>
+            <h1 id="inicio-title">Soy <span class="highlight">Jarvis</span>,<br/>¿Qué quieres hacer hoy?</h1>
+          </div>
+
+          <div id="input-central">
+            <input type="text" id="chat-input" placeholder="Escribe aquí lo que necesitas..." />
+            <div id="input-actions">
+              <label id="btn-adjuntar" title="Adjuntar">
+                📎
+                <input type="file" id="file-input" accept="image/*,video/*,.pdf,.doc,.docx" style="display:none;" />
+              </label>
+              <button id="btn-mic">🎤</button>
+              <button id="btn-send">[ TX ]</button>
+            </div>
+          </div>
+
+          <div id="acciones-rapidas">
+            <div class="accion-card" onclick="cambiarSeccion('vision')">
+              <div class="accion-icon">◎</div>
+              <div class="accion-label">Visión IA</div>
+            </div>
+            <div class="accion-card" onclick="cambiarSeccion('imagenes')">
+              <div class="accion-icon">◻</div>
+              <div class="accion-label">Generar imagen</div>
+            </div>
+            <div class="accion-card" onclick="cambiarSeccion('documentos')">
+              <div class="accion-icon">▤</div>
+              <div class="accion-label">Documentos</div>
+            </div>
+            <div class="accion-card" onclick="cambiarSeccion('musica')">
+              <div class="accion-icon">♪</div>
+              <div class="accion-label">Música</div>
+            </div>
+            <div class="accion-card" onclick="cambiarSeccion('tareas')">
+              <div class="accion-icon">✓</div>
+              <div class="accion-label">Tareas</div>
+            </div>
+          </div>
+
+          <div id="funciones-grid">
+            <div class="funcion-card" onclick="cambiarSeccion('chat')">
+              <div class="funcion-icon">◈</div>
+              <div class="funcion-titulo">Chat inteligente</div>
+              <div class="funcion-desc">Conversa con Jarvis sobre cualquier tema con memoria y contexto.</div>
+              <div class="funcion-arrow">→</div>
+            </div>
+            <div class="funcion-card" onclick="cambiarSeccion('vision')">
+              <div class="funcion-icon">◎</div>
+              <div class="funcion-titulo">Visión por IA</div>
+              <div class="funcion-desc">Analiza imágenes, describe escenas y lee texto con la cámara.</div>
+              <div class="funcion-arrow">→</div>
+            </div>
+            <div class="funcion-card" onclick="cambiarSeccion('documentos')">
+              <div class="funcion-icon">▤</div>
+              <div class="funcion-titulo">Documentos</div>
+              <div class="funcion-desc">Sube PDFs y documentos Word para que Jarvis los analice.</div>
+              <div class="funcion-arrow">→</div>
+            </div>
+            <div class="funcion-card" onclick="cambiarSeccion('imagenes')">
+              <div class="funcion-icon">◻</div>
+              <div class="funcion-titulo">Generar imágenes</div>
+              <div class="funcion-desc">Crea imágenes con IA describiendo lo que imaginas.</div>
+              <div class="funcion-arrow">→</div>
+            </div>
+            <div class="funcion-card" onclick="cambiarSeccion('musica')">
+              <div class="funcion-icon">♪</div>
+              <div class="funcion-titulo">Control musical</div>
+              <div class="funcion-desc">Controla Spotify con tu voz. Reproduce, pausa y cambia canciones.</div>
+              <div class="funcion-arrow">→</div>
+            </div>
+            <div class="funcion-card" onclick="cambiarSeccion('memoria')">
+              <div class="funcion-icon">◉</div>
+              <div class="funcion-titulo">Memoria personal</div>
+              <div class="funcion-desc">Jarvis recuerda tus preferencias, nombre y conversaciones.</div>
+              <div class="funcion-arrow">→</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CHAT -->
+        <section id="sec-chat" class="section">
+          <div class="section-header">
+            <h2 class="section-title">[ CHAT ]</h2>
+            <button id="btn-manos-libres">[ LIVE ]</button>
+          </div>
+          <div id="chat-mensajes"></div>
+          <div id="preview-adjunto" style="display:none;">
+            <div id="preview-contenido"></div>
+            <button id="btn-quitar-adjunto">[ X ]</button>
+          </div>
+          <div id="chat-input-area">
+            <label id="btn-adjuntar-chat" title="Adjuntar">
+              📎
+              <input type="file" id="file-input-chat" accept="image/*,video/*,.pdf,.doc,.docx" style="display:none;" />
+            </label>
+            <input type="text" id="chat-input-chat" placeholder="Escribe a Jarvis..." />
+            <button id="btn-send-chat">[ TX ]</button>
+          </div>
+        </section>
+
+        <!-- VISIÓN -->
+        <section id="sec-vision" class="section">
+          <div class="section-header">
+            <h2 class="section-title">[ VISIÓN ]</h2>
+            <button id="btn-cam">[ CAM ]</button>
+            <button id="btn-capture" style="display:none;">[ SNAP ]</button>
+          </div>
+          <video id="cam-preview" autoplay playsinline></video>
+          <div id="vision-response"></div>
+        </section>
+
+        <!-- DOCUMENTOS -->
+        <section id="sec-documentos" class="section">
+          <div class="section-header">
+            <h2 class="section-title">[ DOCUMENTOS ]</h2>
+          </div>
+          <div id="doc-upload-area">
+            <label id="doc-upload-label">
+              <input type="file" id="doc-file-input" accept=".pdf,.doc,.docx" style="display:none;" />
+              <div id="doc-upload-box">
+                <div class="doc-upload-icon">▤</div>
+                <div class="doc-upload-text">Arrastra o haz clic para subir PDF o Word</div>
+              </div>
+            </label>
+          </div>
+          <div id="doc-preview"></div>
+          <div id="doc-question-area" style="display:none;">
+            <input type="text" id="doc-question" placeholder="Haz una pregunta sobre el documento..." />
+            <button id="doc-ask">[ ANALIZAR ]</button>
+          </div>
+          <div id="doc-response"></div>
+        </section>
+
+        <!-- IMÁGENES -->
+        <section id="sec-imagenes" class="section">
+          <div class="section-header">
+            <h2 class="section-title">[ IMÁGENES ]</h2>
+          </div>
+          <div id="img-input-area">
+            <input type="text" id="img-prompt" placeholder="Describe la imagen que quieres generar..." />
+            <button id="img-generar">[ GENERAR ]</button>
+          </div>
+          <div id="img-gallery"></div>
+        </section>
+
+        <!-- MÚSICA -->
+        <section id="sec-musica" class="section">
+          <div class="section-header">
+            <h2 class="section-title">[ MÚSICA ]</h2>
+            <button id="btn-spotify-connect">[ CONECTAR SPOTIFY ]</button>
+          </div>
+          <div id="musica-input-area">
+            <input type="text" id="musica-query" placeholder="¿Qué quieres escuchar?" />
+            <button id="musica-play">[ PLAY ]</button>
+          </div>
+          <div id="musica-controls">
+            <button id="musica-pause">[ PAUSE ]</button>
+            <button id="musica-next">[ NEXT ]</button>
+            <button id="musica-resume">[ RESUME ]</button>
+          </div>
+          <div id="musica-status"></div>
+        </section>
+
+        <!-- TAREAS -->
+        <section id="sec-tareas" class="section">
+          <div class="section-header">
+            <h2 class="section-title">[ TAREAS ]</h2>
+          </div>
+          <div id="tareas-input">
+            <input type="text" id="tarea-nueva" placeholder="Nueva tarea..." />
+            <button id="tarea-agregar">[ + ]</button>
+          </div>
+          <div id="tareas-lista"></div>
+        </section>
+
+        <!-- MEMORIA -->
+        <section id="sec-memoria" class="section">
+          <div class="section-header">
+            <h2 class="section-title">[ MEMORIA ]</h2>
+            <button id="btn-historial">[ LOG ]</button>
+          </div>
+          <div id="memoria-contenido"></div>
+        </section>
+
+        <!-- AJUSTES -->
+        <section id="sec-ajustes" class="section">
+          <div class="section-header">
+            <h2 class="section-title">[ AJUSTES ]</h2>
+          </div>
+          <div class="config-grupo">
+            <label>Nombre del asistente</label>
+            <input type="text" id="cfg-nombre-asistente" placeholder="Jarvis" />
+          </div>
+          <div class="config-grupo">
+            <label>Tu nombre</label>
+            <input type="text" id="cfg-nombre-usuario" placeholder="Tu nombre" />
+          </div>
+          <div class="config-grupo">
+            <label>Color del tema</label>
+            <div id="cfg-colores">
+              <div class="color-opcion" data-color="#00d4ff" style="background:#00d4ff;"></div>
+              <div class="color-opcion" data-color="#00ff41" style="background:#00ff41;"></div>
+              <div class="color-opcion" data-color="#a855f7" style="background:#a855f7;"></div>
+              <div class="color-opcion" data-color="#ef4444" style="background:#ef4444;"></div>
+              <div class="color-opcion" data-color="#f59e0b" style="background:#f59e0b;"></div>
+              <div class="color-opcion" data-color="#d4af37" style="background:#d4af37;"></div>
+            </div>
+          </div>
+          <div class="config-grupo">
+            <label>Velocidad de voz: <span id="cfg-velocidad-val">1.0</span></label>
+            <input type="range" id="cfg-velocidad" min="0.5" max="2" step="0.1" value="1.0" />
+          </div>
+          <div class="config-grupo">
+            <button id="cfg-borrar-memoria" class="btn-peligro">[ RESET MEM ]</button>
+          </div>
+          <button id="cfg-guardar">[ GUARDAR ]</button>
+        </section>
+
+      </div>
+    </main>
+
+    <!-- Panel derecho -->
+    <aside id="panel-derecho">
+
+      <div id="status-card">
+        <div id="status-card-title">JARVIS STATUS</div>
+        <div id="status-avatar-wrap">
+          <div id="status-ring"></div>
+          <div id="status-ring2"></div>
+          <div id="status-ring3"></div>
+          <span id="status-letter">J</span>
+        </div>
+        <div id="status-indicator">
+          <div id="status-dot"></div>
+          <span id="status-text">En línea</span>
+        </div>
+        <div id="status-sub">Listo para ayudarte</div>
+        <p id="response"></p>
+      </div>
+
+      <div id="uso-card">
+        <div class="panel-card-title">USO HOY</div>
+        <div class="uso-item">
+          <div class="uso-label">
+            <span>Mensajes</span>
+            <span id="uso-mensajes-num">0 / ∞</span>
+          </div>
+          <div class="uso-bar-wrap"><div class="uso-bar" id="uso-mensajes-bar" style="width:0%"></div></div>
+        </div>
+        <div class="uso-item">
+          <div class="uso-label">
+            <span>Imágenes</span>
+            <span id="uso-imagenes-num">0 / 50</span>
+          </div>
+          <div class="uso-bar-wrap"><div class="uso-bar" id="uso-imagenes-bar" style="width:0%"></div></div>
+        </div>
+        <div class="uso-item">
+          <div class="uso-label">
+            <span>Búsquedas</span>
+            <span id="uso-busquedas-num">0 / 100</span>
+          </div>
+          <div class="uso-bar-wrap"><div class="uso-bar" id="uso-busquedas-bar" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div id="actividad-card">
+        <div class="panel-card-title">ACTIVIDAD RECIENTE</div>
+        <div id="actividad-lista"></div>
+      </div>
+
+      <div id="integraciones-card">
+        <div class="panel-card-title">INTEGRACIONES</div>
+        <div id="integraciones-lista">
+          <div class="integracion-item">
+            <div class="integracion-nombre">Groq / LLaMA</div>
+            <div class="integracion-status connected">● Conectado</div>
+          </div>
+          <div class="integracion-item">
+            <div class="integracion-nombre">Gemini Vision</div>
+            <div class="integracion-status connected">● Conectado</div>
+          </div>
+          <div class="integracion-item">
+            <div class="integracion-nombre">ElevenLabs</div>
+            <div class="integracion-status" id="status-eleven">● Conectado</div>
+          </div>
+          <div class="integracion-item">
+            <div class="integracion-nombre">Spotify</div>
+            <div class="integracion-status" id="status-spotify">○ Desconectado</div>
+          </div>
+          <div class="integracion-item">
+            <div class="integracion-nombre">SerpAPI</div>
+            <div class="integracion-status connected">● Conectado</div>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+  </div>
+
+  <!-- Panel historial -->
+  <div id="panel-historial" style="display:none;">
+    <div id="historial-contenido">
+      <div id="historial-header">
+        <h2>[ LOG ]</h2>
+        <button id="btn-cerrar-historial">[ X ]</button>
+      </div>
+      <div id="historial-busqueda">
+        <input type="text" id="historial-input" placeholder="Buscar en historial..." />
+      </div>
+      <div id="historial-lista"></div>
+      <button id="btn-borrar-historial" class="btn-peligro">[ RESET LOG ]</button>
+    </div>
+  </div>
+
+  <div id="transcript" style="display:none;"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
