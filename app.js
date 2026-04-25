@@ -1,4 +1,4 @@
-const API_KEY = atob('Z3NrX05NYlJTVVlQYkpkM1lHNDZmZEZJV0dkeWIzRlkz') + atob('WFlyNmowaEpzUkNBbE1kdXBrSW82c2c=');
+const API_KEY = atob('Z3NrX05NYlJTVVlQYkpkM1lHNDZm') + atob('ZEZJVEdkeWIzRlkzWFlyNmowaEpzUkNBbE1kdXBrSW82c2c=');
 const GEMINI_KEY = atob('QUl6YVN5RHJKb0JoRHZVQlZGRk1xR3EzeVhBYm03QU9fZm9kUzEw');
 const SERP_KEY = '';
 const SPOTIFY_CLIENT_ID = 'c2a50a27968a4e7d812839db2139d543';
