@@ -1,9 +1,12 @@
-const API_KEY = atob('Z3NrX05NYlJTVVlQYkpkM1lHNDZm') + atob('ZEZJVEdkeWIzRlkzWFlyNmowaEpzUkNBbE1kdXBrSW82c2c=');
-const GEMINI_KEY = atob('QUl6YVN5RHJKb0JoRHZVQlZGRk1xR3EzeVhBYm03QU9fZm9kUzEw');
-const SERP_KEY = '';
-const SPOTIFY_CLIENT_ID = 'c2a50a27968a4e7d812839db2139d543';
-const SPOTIFY_REDIRECT = 'https://amezcuaoscar17-ui.github.io/mi-jarvis/callback';
-const ELEVEN_KEY = atob('c2tfODk4MjEyMDZjMTc4ZDRhMDIzZmFjMTE5N2ZmNzIxMzZlNTA1MjIwNDgwY2Y1NWMw');
+// ── Claves API — cargadas desde config.js (NO están aquí) ──
+// ⚠️  config.js está en .gitignore y NUNCA se sube a Git
+const API_KEY = (typeof CONFIG !== 'undefined') ? CONFIG.GROQ_KEY : '';
+const GEMINI_KEY = (typeof CONFIG !== 'undefined') ? CONFIG.GEMINI_KEY : '';
+const SERP_KEY = (typeof CONFIG !== 'undefined') ? CONFIG.SERP_KEY : '';
+const TAVILY_KEY = (typeof CONFIG !== 'undefined') ? CONFIG.TAVILY_KEY : '';
+const SPOTIFY_CLIENT_ID = (typeof CONFIG !== 'undefined') ? CONFIG.SPOTIFY_CLIENT_ID : '';
+const SPOTIFY_REDIRECT = (typeof CONFIG !== 'undefined') ? CONFIG.SPOTIFY_REDIRECT : 'http://localhost:3000/callback.html';
+const ELEVEN_KEY = (typeof CONFIG !== 'undefined') ? CONFIG.ELEVEN_KEY : '';
 const ELEVEN_VOICE_ID = 'pNInz6obpgDQGcFmaJgB';
 
 // ── Historial de conversaciones ───────────────────────
@@ -30,8 +33,8 @@ function mostrarHistorial(filtro = '') {
 
   const filtrado = filtro
     ? historial.filter(h =>
-        h.usuario.toLowerCase().includes(filtro.toLowerCase()) ||
-        h.jarvis.toLowerCase().includes(filtro.toLowerCase()))
+      h.usuario.toLowerCase().includes(filtro.toLowerCase()) ||
+      h.jarvis.toLowerCase().includes(filtro.toLowerCase()))
     : historial;
 
   if (filtrado.length === 0) {
@@ -299,57 +302,38 @@ async function buscarEnWikipedia(query) {
   }
 }
 
-async function buscarEnGoogle(query) {
+// ── Tavily AI — Motor de búsqueda inteligente ────────────
+async function buscarConTavily(query, opciones = {}) {
   try {
-    if (statusEl) statusEl.textContent = 'Buscando en Google...';
-    const res = await fetch(
-      `https://serpapi.com/search.json?q=${encodeURIComponent(query)}&hl=es&gl=mx&api_key=${SERP_KEY}`
-    );
+    if (statusEl) statusEl.textContent = 'Buscando con Tavily...';
+    const res = await fetch('https://api.tavily.com/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        api_key: TAVILY_KEY,
+        query: query,
+        search_depth: opciones.profundidad || 'basic',
+        max_results: opciones.maxResultados || 5,
+        include_answer: true,
+        include_raw_content: false,
+        topic: opciones.topic || 'general'
+      })
+    });
     const data = await res.json();
-
-    let resultados = [];
-
-    if (data.answer_box) {
-      if (data.answer_box.answer) return data.answer_box.answer;
-      if (data.answer_box.snippet) return data.answer_box.snippet;
-      if (data.answer_box.result) return data.answer_box.result;
-    }
-
-    if (data.knowledge_graph) {
-      const kg = data.knowledge_graph;
-      let info = '';
-      if (kg.description) info += kg.description + ' ';
-      if (kg.address) info += `Dirección: ${kg.address}. `;
-      if (kg.phone) info += `Teléfono: ${kg.phone}. `;
-      if (kg.hours) info += `Horario: ${kg.hours}. `;
-      if (info) return info.trim();
-    }
-
-    if (data.organic_results && data.organic_results.length > 0) {
-      resultados = data.organic_results
-        .slice(0, 3)
-        .filter(r => r.snippet)
-        .map(r => r.snippet);
-      if (resultados.length > 0) return resultados[0];
-    }
-
-    return null;
+    if (data.error) { console.error('Tavily:', data.error); return null; }
+    return data;
   } catch (err) {
-    console.error('SerpAPI error:', err);
+    console.error('Tavily fetch error:', err);
     return null;
   }
 }
 
 async function buscarEnInternet(query) {
-  const googleResult = await buscarEnGoogle(query);
-  if (googleResult) return googleResult;
-
   try {
     const res = await fetch(
       `https://en.wikipedia.org/w/api.php?action=search&list=search&srsearch=${encodeURIComponent(query)}&format=json&origin=*&srlimit=3`
     );
     const data = await res.json();
-
     if (data.query?.search?.length > 0) {
       const titulo = data.query.search[0].title;
       const resWiki = await fetch(
@@ -369,13 +353,107 @@ async function buscarEnInternet(query) {
 async function buscarInformacion(query) {
   if (statusEl) statusEl.textContent = 'Buscando...';
 
+  // 1️⃣ Tavily (datos limpios, en tiempo real)
+  if (TAVILY_KEY) {
+    const tavily = await buscarConTavily(query);
+    if (tavily) {
+      usoBusquedas++;
+      localStorage.setItem('uso-busquedas-hoy', usoBusquedas);
+      actualizarUso();
+      if (tavily.answer) return tavily.answer;
+      if (tavily.results?.length > 0) return tavily.results[0].content?.substring(0, 400) || null;
+    }
+  }
+
+  // 2️⃣ Fallback: Wikipedia es
   const resultado1 = await buscarEnWikipedia(query);
   if (resultado1) return resultado1;
 
+  // 3️⃣ Fallback: Wikipedia en
   const resultado2 = await buscarEnInternet(query);
   if (resultado2) return `Según Wikipedia: ${resultado2}`;
 
   return null;
+}
+
+// ── Resumen Ejecutivo con Tavily + Groq ──────────────────
+async function generarResumenEjecutivo(entidad) {
+  if (statusEl) statusEl.textContent = 'Analizando inteligencia de mercado...';
+  if (ring) ring.classList.add('active');
+
+  const resultados = await buscarConTavily(
+    `${entidad} empresa negocio mercado información reciente`,
+    { profundidad: 'advanced', maxResultados: 5 }
+  );
+
+  let contexto = '';
+  if (resultados?.answer) contexto += `Respuesta directa: ${resultados.answer}\n\n`;
+  if (resultados?.results?.length > 0) {
+    resultados.results.slice(0, 4).forEach((r, i) => {
+      contexto += `Fuente ${i + 1} — ${r.title}:\n${r.content?.substring(0, 300) || ''}\n\n`;
+    });
+  }
+
+  if (!contexto) {
+    if (ring) ring.classList.remove('active');
+    return `No encontré información suficiente sobre "${entidad}". Intente con otro nombre.`;
+  }
+
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + API_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [{
+          role: 'user',
+          content: `Eres un analista de inteligencia de negocios de élite. Con base en la siguiente información real sobre "${entidad}", genera un reporte ejecutivo.
+
+Información disponible:
+${contexto}
+Responde EXACTAMENTE en este formato:
+
+📊 ANÁLISIS EJECUTIVO: ${entidad}
+🔹 [Hecho más relevante con dato concreto]
+🔹 [Oportunidad o riesgo principal detectado]
+🔹 [Recomendación de acción concreta]
+
+⚡ NIVEL DE OPORTUNIDAD: [Alto 🟢 / Medio 🟡 / Bajo 🔴]
+
+Se conciso, datos reales, español mexicano.`
+        }],
+        max_tokens: 500,
+        temperature: 0.25
+      })
+    });
+    const data = await res.json();
+    if (ring) ring.classList.remove('active');
+    return data.choices?.[0]?.message?.content || `Información sobre ${entidad} procesada.`;
+  } catch (err) {
+    if (ring) ring.classList.remove('active');
+    return `📊 ${entidad}:\n${contexto.substring(0, 600)}`;
+  }
+}
+
+// ── Noticias en tiempo real con Tavily ─────────────────
+async function buscarNoticias(tema) {
+  if (statusEl) statusEl.textContent = 'Buscando noticias...';
+  if (ring) ring.classList.add('active');
+
+  const resultados = await buscarConTavily(`noticias recientes ${tema}`, {
+    topic: 'news', maxResultados: 5, profundidad: 'basic'
+  });
+
+  if (ring) ring.classList.remove('active');
+  if (!resultados) return 'No pude obtener noticias en este momento.';
+  if (resultados.answer) return `📰 Noticias sobre ${tema}:\n\n${resultados.answer}`;
+  if (resultados.results?.length > 0) {
+    const items = resultados.results.slice(0, 3)
+      .map(r => `• ${r.title}: ${r.content?.substring(0, 130) || ''}`)
+      .join('\n');
+    return `📰 Noticias sobre ${tema}:\n\n${items}`;
+  }
+  return `No encontré noticias recientes sobre "${tema}".`;
 }
 
 // ── Traducción instantánea ────────────────────────────
@@ -589,7 +667,7 @@ async function abrirMusica(query) {
     return `Abriendo "${query}" en YouTube. Di "conectar Spotify" para usar Spotify.`;
   }
 }
- 
+
 async function reproducirEnYoutube(query) {
   try {
     if (statusEl) statusEl.textContent = 'Buscando canción...';
@@ -672,8 +750,8 @@ async function detectarComando(texto) {
 
   // Clima
   const climaMatch = t.match(/clima (?:en|de) ([a-záéíóúñ\s]+)/i) ||
-                     t.match(/(?:cómo|como) está el clima en ([a-záéíóúñ\s]+)/i) ||
-                     t.match(/(?:cómo|como) está el tiempo en ([a-záéíóúñ\s]+)/i);
+    t.match(/(?:cómo|como) está el clima en ([a-záéíóúñ\s]+)/i) ||
+    t.match(/(?:cómo|como) está el tiempo en ([a-záéíóúñ\s]+)/i);
   if (climaMatch) {
     return await obtenerClima(climaMatch[1].trim());
   }
@@ -684,7 +762,7 @@ async function detectarComando(texto) {
 
   // Notas — guardar
   const notaMatch = t.match(/(?:guarda|anota|recuerda) (?:que |esto: |que )?(.+)/i) ||
-                    t.match(/nota: (.+)/i);
+    t.match(/nota: (.+)/i);
   if (notaMatch) {
     const nota = notaMatch[1].trim();
     guardarNota(nota);
@@ -698,7 +776,7 @@ async function detectarComando(texto) {
 
   // Alarma en minutos
   const alarmaMatch = t.match(/(?:alarma|avísame|recuérdame|avisa) (?:en |dentro de )?(\d+) minutos?/i) ||
-                      t.match(/(\d+) minutos? (?:para|después)/i);
+    t.match(/(\d+) minutos? (?:para|después)/i);
   if (alarmaMatch) {
     const mins = parseInt(alarmaMatch[1]);
     programarAlarma(mins, null);
@@ -707,7 +785,7 @@ async function detectarComando(texto) {
 
   // Recordatorio con hora específica
   const recordatorioMatch = t.match(/recuérdame (.+) a las (\d+):?(\d*)/i) ||
-                             t.match(/recuérdame a las (\d+):?(\d*) (.+)/i);
+    t.match(/recuérdame a las (\d+):?(\d*) (.+)/i);
   if (recordatorioMatch) {
     const ahora = new Date();
     let hora, mins2, mensaje2;
@@ -731,16 +809,29 @@ async function detectarComando(texto) {
     return `Recordatorio programado para las ${hora}:${String(mins2).padStart(2, '0')}. Faltan ${diferencia} minutos.`;
   }
 
+  // ── Inteligencia de mercado (Tavily + Groq) ───────────
+  const analisisMatch = t.match(/(?:analiza|investiga|analízame|dame un análisis de|resumen ejecutivo de|qué sabes de|info de|dime sobre) (?:a |la empresa |el negocio |la marca |la persona )?(.+)/i);
+  if (analisisMatch) {
+    const entidad = analisisMatch[1].trim().replace(/[?¿.!¡]$/g, '');
+    return await generarResumenEjecutivo(entidad);
+  }
+
+  // Noticias en tiempo real
+  const noticiasMatch = t.match(/(?:noticias de|noticias sobre|qué hay de nuevo sobre|últimas noticias de|novedades de) (.+)/i);
+  if (noticiasMatch) {
+    return await buscarNoticias(noticiasMatch[1].trim());
+  }
+
   // Búsqueda web
   if (t.includes('busca') || t.includes('buscar') || t.includes('qué es') ||
-      t.includes('que es') || t.includes('quién es') || t.includes('quien es') ||
-      t.includes('cuándo') || t.includes('cuando') || t.includes('dónde está') ||
-      t.includes('donde esta') || t.includes('cuál es') || t.includes('cual es') ||
-      t.includes('dónde queda') || t.includes('donde queda') ||
-      t.includes('dónde se encuentra') || t.includes('donde se encuentra') ||
-      t.includes('cómo llego') || t.includes('como llego') ||
-      t.includes('cuánto cuesta') || t.includes('cuanto cuesta') ||
-      t.includes('qué significa') || t.includes('que significa')) {
+    t.includes('que es') || t.includes('quién es') || t.includes('quien es') ||
+    t.includes('cuándo') || t.includes('cuando') || t.includes('dónde está') ||
+    t.includes('donde esta') || t.includes('cuál es') || t.includes('cual es') ||
+    t.includes('dónde queda') || t.includes('donde queda') ||
+    t.includes('dónde se encuentra') || t.includes('donde se encuentra') ||
+    t.includes('cómo llego') || t.includes('como llego') ||
+    t.includes('cuánto cuesta') || t.includes('cuanto cuesta') ||
+    t.includes('qué significa') || t.includes('que significa')) {
     const query = texto
       .replace(/busca|buscar|qué es|que es|quién es|quien es|dónde está|donde esta|cuál es|cual es|cuándo|cuando|dónde queda|donde queda|dónde se encuentra|donde se encuentra|cómo llego|como llego|cuánto cuesta|cuanto cuesta|qué significa|que significa/gi, '')
       .trim();
@@ -862,7 +953,7 @@ async function detectarComando(texto) {
 
   // Generar imagen
   const imagenMatch = t.match(/(?:genera|crea|dibuja|hazme|muéstrame) (?:una |un )?imagen (?:de |del |de la )?(.+)/i) ||
-                      t.match(/(?:genera|crea|dibuja) (.+)/i);
+    t.match(/(?:genera|crea|dibuja) (.+)/i);
   if (imagenMatch) {
     const descripcion = imagenMatch[1].trim();
     await generarImagen(descripcion);
@@ -1065,7 +1156,7 @@ function iniciarModoManoLibres() {
   reconocimientoFondo.onend = () => {
     if (modoManoLibres) {
       setTimeout(() => {
-        try { reconocimientoFondo.start(); } catch(e) {}
+        try { reconocimientoFondo.start(); } catch (e) { }
       }, 300);
     }
   };
@@ -1073,7 +1164,7 @@ function iniciarModoManoLibres() {
   reconocimientoFondo.onerror = () => {
     if (modoManoLibres) {
       setTimeout(() => {
-        try { reconocimientoFondo.start(); } catch(e) {}
+        try { reconocimientoFondo.start(); } catch (e) { }
       }, 1000);
     }
   };
@@ -1081,13 +1172,13 @@ function iniciarModoManoLibres() {
   try {
     reconocimientoFondo.start();
     if (statusEl) statusEl.textContent = 'Manos libres activo';
-  } catch(e) {}
+  } catch (e) { }
 }
 
 function detenerModoManoLibres() {
   modoManoLibres = false;
   if (reconocimientoFondo) {
-    try { reconocimientoFondo.stop(); } catch(e) {}
+    try { reconocimientoFondo.stop(); } catch (e) { }
     reconocimientoFondo = null;
   }
   if (statusEl) statusEl.textContent = 'Listo';
@@ -1588,6 +1679,7 @@ function cambiarSeccion(nombre) {
   if (nav) nav.classList.add('active');
 
   if (nombre === 'memoria') mostrarMemoria();
+  if (nombre === 'prospeccion') inicializarProspeccion();
   if (nombre === 'ajustes') {
     const cfg = cargarConfig();
     const mem = cargarMemoria();
@@ -1858,6 +1950,18 @@ function actualizarStatusElevenLabs() {
   el.className = 'integracion-status connected';
 }
 
+function actualizarStatusTavily() {
+  const el = document.getElementById('status-tavily');
+  if (!el) return;
+  if (TAVILY_KEY && TAVILY_KEY.length > 10) {
+    el.textContent = '● Conectado';
+    el.className = 'integracion-status connected';
+  } else {
+    el.textContent = '○ Sin configurar';
+    el.className = 'integracion-status';
+  }
+}
+
 function actualizarStatusSpotify() {
   const el = document.getElementById('status-spotify');
   if (!el) return;
@@ -1989,6 +2093,934 @@ window.addEventListener('load', async () => {
 
   renderizarTareas();
   actualizarUso();
-  actualizarStatusSpotify(); actualizarStatusElevenLabs();
+  actualizarStatusSpotify(); actualizarStatusElevenLabs(); actualizarStatusTavily();
+  checkDailyBriefing();
   await speak(saludo);
 });
+
+// ── Daily Briefing (Fase 3) ───────────────────────────
+async function generarDailyBriefing(silencioso = false) {
+  const btnReg = document.getElementById('btn-regenerar-briefing');
+  const btnTop = document.getElementById('btn-briefing');
+  if (btnReg) btnReg.disabled = true;
+  if (btnTop) btnTop.disabled = true;
+  if (statusEl) statusEl.textContent = 'Preparando Daily Briefing...';
+  if (ring) ring.classList.add('active');
+
+  const sector = localStorage.getItem('jarvis-briefing-sector') || 'tecnología y negocios México';
+
+  // 1. Noticias del sector via Tavily
+  const noticias = await buscarConTavily(`noticias importantes hoy ${sector}`, {
+    topic: 'news', maxResultados: 5, profundidad: 'basic'
+  });
+
+  // 2. Tareas pendientes
+  const pendientes = tareas.filter(t => !t.done);
+
+  // 3. Construir contexto
+  let contexto = '';
+  if (noticias?.answer) contexto += `Noticias de hoy: ${noticias.answer}\n\n`;
+  if (noticias?.results?.length > 0) {
+    noticias.results.slice(0, 4).forEach(r => {
+      contexto += `• ${r.title}: ${r.content?.substring(0, 180)}\n`;
+    });
+  }
+  const tareasTexto = pendientes.length > 0
+    ? `\nTareas pendientes del usuario: ${pendientes.map(t => t.texto).join(', ')}.`
+    : '';
+
+  const fecha = new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
+
+  const prompt = `Eres Jarvis, asistente personal de alto nivel. Genera un briefing matutino profesional y motivador.
+
+Fecha: ${fecha}
+Sector de interés: ${sector}
+${contexto ? `Información de hoy:\n${contexto}` : ''}
+${tareasTexto}
+
+Genera un briefing CONCISO de máximo 4 oraciones que incluya:
+1. Saludo con la fecha
+2. 2 noticias clave del sector (si hay)
+3. Menciona las tareas pendientes (si hay)
+4. Cierra con una frase de energía breve
+
+Se directo, profesional, energético. Español mexicano.`;
+
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + API_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 280,
+        temperature: 0.6
+      })
+    });
+    const data = await res.json();
+    const texto = data.choices?.[0]?.message?.content
+      || `Buenos días. Hoy es ${fecha}. Jarvis listo y en línea, señor.`;
+
+    mostrarBriefingUI(texto, fecha);
+    if (!silencioso) await speak(texto);
+    agregarActividad('☀', 'Daily Briefing generado');
+
+  } catch (err) {
+    const fallback = `Buenos días. Hoy es ${fecha}. Jarvis en línea.`;
+    mostrarBriefingUI(fallback, fecha);
+    if (!silencioso) await speak(fallback);
+  }
+
+  if (ring) ring.classList.remove('active');
+  if (statusEl) statusEl.textContent = 'En línea';
+  if (btnReg) { btnReg.disabled = false; btnReg.textContent = '[ ↻ REGENERAR ]'; }
+  if (btnTop) btnTop.disabled = false;
+}
+
+function mostrarBriefingUI(texto, fecha) {
+  const contenido = document.getElementById('briefing-contenido');
+  const fechaEl = document.getElementById('briefing-fecha');
+  if (!contenido) return;
+
+  if (fechaEl) fechaEl.textContent = fecha || new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
+  contenido.textContent = texto;
+  contenido.classList.add('loaded');
+
+  localStorage.setItem('jarvis-briefing-hoy', JSON.stringify({
+    texto, fecha: new Date().toDateString()
+  }));
+}
+
+function checkDailyBriefing() {
+  const guardado = localStorage.getItem('jarvis-briefing-hoy');
+  if (guardado) {
+    const d = JSON.parse(guardado);
+    if (d.fecha === new Date().toDateString()) {
+      mostrarBriefingUI(d.texto);
+      return; // Ya generado hoy, solo mostrar
+    }
+  }
+  // Auto-generar si es mañana (6-10am)
+  const hora = new Date().getHours();
+  if (hora >= 6 && hora < 10) {
+    setTimeout(() => generarDailyBriefing(false), 4000);
+  }
+}
+
+// Botones del briefing
+const btnRegenerarBriefing = document.getElementById('btn-regenerar-briefing');
+const btnBriefingTop = document.getElementById('btn-briefing');
+
+if (btnRegenerarBriefing) {
+  btnRegenerarBriefing.addEventListener('click', () => generarDailyBriefing(false));
+}
+if (btnBriefingTop) {
+  btnBriefingTop.addEventListener('click', () => generarDailyBriefing(false));
+}
+
+// Sincronizar sector del briefing con Ajustes
+const cfgBriefingSector = document.getElementById('cfg-briefing-sector');
+if (cfgBriefingSector) {
+  cfgBriefingSector.value = localStorage.getItem('jarvis-briefing-sector') || '';
+}
+
+// Guardar sector al guardar config
+const _cfgGuardar = document.getElementById('cfg-guardar');
+if (_cfgGuardar) {
+  _cfgGuardar.addEventListener('click', () => {
+    const sector = cfgBriefingSector?.value.trim();
+    if (sector) localStorage.setItem('jarvis-briefing-sector', sector);
+  }, { once: false });
+}
+
+// ── Módulo de Prospección ───────────────────────────────
+
+let prospectosData = [];
+
+function inicializarProspeccion() {
+  // ya inicializado con event listeners al final
+}
+
+async function buscarProspectos(ciudad, rubro) {
+  const filtros = [];
+  if (document.getElementById('filtro-sin-chatbot')?.checked) filtros.push('sin chat en línea');
+  if (document.getElementById('filtro-web-vieja')?.checked) filtros.push('con sitio web desactualizado');
+  if (document.getElementById('filtro-poca-presencia')?.checked) filtros.push('poca presencia digital');
+
+  const query = `${rubro} negocios ${ciudad} México directorio empresas sitio web teléfono ${filtros.join(' ')}`;
+
+  const resultados = await buscarConTavily(query, {
+    profundidad: 'advanced',
+    maxResultados: 8,
+    topic: 'general'
+  });
+
+  if (!resultados?.results?.length) return [];
+
+  return resultados.results
+    .filter(r => r.url && r.title)
+    .map((r, i) => ({
+      id: i,
+      nombre: r.title,
+      url: r.url,
+      descripcion: r.content?.substring(0, 250) || '',
+      pitch: null,
+      score: null
+    }));
+}
+
+async function analizarYGenerarPitch(prospecto, ciudad, rubro) {
+  const prompt = `Eres un experto en ventas digitales y desarrollo de negocios. Analiza este prospecto y genera un pitch de ventas personalizado.
+
+Negocio: ${prospecto.nombre}
+Sitio web: ${prospecto.url}
+Descripción: ${prospecto.descripcion}
+Ciudad: ${ciudad} | Ramo: ${rubro}
+
+Responde en este formato EXACTO:
+
+⚠️ PROBLEMAS DETECTADOS:
+• [Problema digital específico del negocio]
+• [Oportunidad de mejora concreta]
+
+📧 GUIÓN DE VENTA:
+Hola [nombre del negocio], vi su presencia en línea y [observación específica]. En [empresa del vendedor] ayudamos a [ramo] en [ciudad] a [beneficio concreto]. ¿Tendrían 15 minutos esta semana para ver cómo podríamos ayudarles?
+
+⭐ SCORE DE OPORTUNIDAD: [número del 1 al 10]
+
+Se breve, directo y usa datos específicos del negocio. Responde en español.`;
+
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + API_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 450,
+        temperature: 0.5
+      })
+    });
+    const data = await res.json();
+    const texto = data.choices?.[0]?.message?.content || 'No se pudo generar el pitch.';
+
+    // Extraer score del texto
+    const scoreMatch = texto.match(/SCORE DE OPORTUNIDAD:\s*(\d+)/i);
+    const score = scoreMatch ? parseInt(scoreMatch[1]) : 5;
+
+    return { texto, score };
+  } catch (err) {
+    return { texto: 'Error al generar el pitch. Verifica tu conexión.', score: 5 };
+  }
+}
+
+function scoreToBadge(score) {
+  if (score === null) return { clase: '', label: '-- / 10' };
+  if (score >= 7) return { clase: 'prosp-score-alto', label: `🟢 ${score}/10` };
+  if (score >= 4) return { clase: 'prosp-score-medio', label: `🟡 ${score}/10` };
+  return { clase: 'prosp-score-bajo', label: `🔴 ${score}/10` };
+}
+
+function renderizarProspectos(lista, ciudad, rubro) {
+  const contenedor = document.getElementById('prospectos-lista');
+  if (!contenedor) return;
+  contenedor.innerHTML = '';
+
+  if (!lista.length) {
+    contenedor.innerHTML = '<div style="color:#4a6a8a;font-size:12px;text-align:center;padding:2rem;">No se encontraron resultados. Intenta con otro ramo o ciudad.</div>';
+    return;
+  }
+
+  lista.forEach((p) => {
+    const badge = scoreToBadge(p.score);
+    const card = document.createElement('div');
+    card.classList.add('prospecto-card');
+    card.dataset.id = p.id;
+    card.innerHTML = `
+      <div class="prosp-card-header">
+        <div class="prosp-card-nombre">${p.nombre}</div>
+        <div class="prosp-score-badge ${badge.clase}">${badge.label}</div>
+      </div>
+      <a class="prosp-card-url" href="${p.url}" target="_blank" rel="noopener">${p.url}</a>
+      <div class="prosp-card-desc">${p.descripcion || 'Sin descripción disponible.'}</div>
+      <div class="prosp-card-actions">
+        <button class="btn-generar-pitch" data-id="${p.id}">[ ⚡ GENERAR PITCH ]</button>
+      </div>
+      <div class="prosp-pitch-area" id="pitch-${p.id}"></div>
+    `;
+    contenedor.appendChild(card);
+  });
+
+  // Delegación de eventos para los botones de pitch
+  contenedor.querySelectorAll('.btn-generar-pitch').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = parseInt(btn.dataset.id);
+      const prospecto = prospectosData[id];
+      if (!prospecto) return;
+
+      btn.disabled = true;
+      btn.textContent = '[ ANALIZANDO... ]';
+
+      const pitchArea = document.getElementById(`pitch-${id}`);
+      if (pitchArea) {
+        pitchArea.classList.add('visible');
+        pitchArea.innerHTML = '<span class="prosp-pitch-loading">> Generando pitch personalizado...</span>';
+      }
+
+      const resultado = await analizarYGenerarPitch(prospecto, ciudad, rubro);
+      prospecto.pitch = resultado.texto;
+      prospecto.score = resultado.score;
+
+      // Actualizar badge
+      const cardEl = document.querySelector(`.prospecto-card[data-id="${id}"]`);
+      if (cardEl) {
+        const badge = scoreToBadge(resultado.score);
+        const badgeEl = cardEl.querySelector('.prosp-score-badge');
+        if (badgeEl) { badgeEl.textContent = badge.label; badgeEl.className = `prosp-score-badge ${badge.clase}`; }
+      }
+
+      if (pitchArea) pitchArea.textContent = resultado.texto;
+
+      btn.disabled = false;
+      btn.textContent = '[ ✓ PITCH LISTO ]';
+
+      agregarActividad('◎', `Pitch generado: ${prospecto.nombre}`);
+    });
+  });
+}
+
+function exportarProspectos() {
+  if (!prospectosData.length) return;
+  let texto = `PROSPECTOS JARVIS — ${new Date().toLocaleString('es-MX')}\n${'='.repeat(60)}\n\n`;
+  prospectosData.forEach((p, i) => {
+    texto += `${i + 1}. ${p.nombre}\n`;
+    texto += `   URL: ${p.url}\n`;
+    if (p.score) texto += `   Score: ${p.score}/10\n`;
+    if (p.pitch) texto += `\n${p.pitch}\n`;
+    texto += `\n${'-'.repeat(40)}\n\n`;
+  });
+
+  const blob = new Blob([texto], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `prospectos-jarvis-${Date.now()}.txt`;
+  a.click();
+}
+
+// Event listeners de prospección
+const btnBuscarProspectos = document.getElementById('btn-buscar-prospectos');
+const btnExportarProspectos = document.getElementById('btn-exportar-prospectos');
+const prospCiudad = document.getElementById('prosp-ciudad');
+const prospRubro = document.getElementById('prosp-rubro');
+const prospStatus = document.getElementById('prosp-status');
+
+if (btnBuscarProspectos) {
+  btnBuscarProspectos.addEventListener('click', async () => {
+    const ciudad = prospCiudad?.value.trim();
+    const rubro = prospRubro?.value.trim();
+    if (!ciudad || !rubro) {
+      if (prospStatus) prospStatus.textContent = 'Ingresa ciudad y ramo para buscar.';
+      return;
+    }
+    if (prospStatus) prospStatus.textContent = `> Buscando ${rubro} en ${ciudad}...`;
+    btnBuscarProspectos.disabled = true;
+
+    prospectosData = await buscarProspectos(ciudad, rubro);
+
+    if (prospStatus) prospStatus.textContent = prospectosData.length
+      ? `> ${prospectosData.length} prospectos encontrados. Genera pitches para cada uno.`
+      : '> Sin resultados. Intenta con otro ramo o ciudad.';
+
+    renderizarProspectos(prospectosData, ciudad, rubro);
+    btnBuscarProspectos.disabled = false;
+    agregarActividad('◎', `Prospección: ${rubro} en ${ciudad}`);
+  });
+}
+
+if (prospCiudad) {
+  prospRubro?.addEventListener('keydown', e => { if (e.key === 'Enter') btnBuscarProspectos?.click(); });
+  prospCiudad?.addEventListener('keydown', e => { if (e.key === 'Enter') prospRubro?.focus(); });
+}
+
+if (btnExportarProspectos) {
+  btnExportarProspectos.addEventListener('click', exportarProspectos);
+}
+// ============================================================
+// PEGA ESTO AL FINAL DE app.js (después de la última línea)
+// ============================================================
+
+// ── CRM — Pipeline de Ventas ─────────────────────────────────
+
+const ETAPAS = ['nuevo', 'contactado', 'demo', 'propuesta', 'cerrado', 'perdido'];
+
+function getCRM() {
+  try { return JSON.parse(localStorage.getItem('jarvis-crm') || '[]'); } catch { return []; }
+}
+
+function saveCRM(data) {
+  localStorage.setItem('jarvis-crm', JSON.stringify(data));
+}
+
+function crmNuevoId() {
+  return 'crm-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
+}
+
+// ── Renderizar todo el pipeline ──
+function renderCRM() {
+  const data = getCRM();
+
+  // Limpiar columnas
+  ETAPAS.forEach(etapa => {
+    const col = document.getElementById('cards-' + etapa);
+    if (col) col.innerHTML = '';
+  });
+
+  // Contar y actualizar stats
+  const total = data.length;
+  const contactados = data.filter(c => c.etapa !== 'nuevo').length;
+  const demos = data.filter(c => c.etapa === 'demo' || c.etapa === 'propuesta' || c.etapa === 'cerrado').length;
+  const cerrados = data.filter(c => c.etapa === 'cerrado').length;
+
+  const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  setEl('crm-total', total);
+  setEl('crm-contactados', contactados);
+  setEl('crm-demos', demos);
+  setEl('crm-cerrados', cerrados);
+
+  // Contar por columna
+  ETAPAS.forEach(etapa => {
+    const count = data.filter(c => c.etapa === etapa).length;
+    setEl('cnt-' + etapa, count);
+  });
+
+  // Renderizar tarjetas
+  data.forEach(contacto => {
+    const col = document.getElementById('cards-' + contacto.etapa);
+    if (!col) return;
+
+    const ultimaNota = contacto.notas?.length
+      ? contacto.notas[contacto.notas.length - 1]
+      : null;
+
+    const card = document.createElement('div');
+    card.classList.add('crm-card');
+    card.dataset.id = contacto.id;
+    card.innerHTML = `
+      <div class="crm-card-nombre">${contacto.nombre}</div>
+      <div class="crm-card-empresa">${contacto.empresa}</div>
+      <div class="crm-card-sector">${contacto.sector}</div>
+      ${ultimaNota ? `<div class="crm-card-nota-preview">↳ ${ultimaNota.texto}</div>` : ''}
+      <div class="crm-card-actions">
+        <a class="crm-btn-wa" href="https://wa.me/${contacto.telefono.replace(/\D/g, '')}" target="_blank" rel="noopener">[ WA ]</a>
+        <button class="crm-btn-ver" data-id="${contacto.id}">[ VER ]</button>
+        <button class="crm-btn-del" data-id="${contacto.id}">[ X ]</button>
+      </div>
+    `;
+    col.appendChild(card);
+  });
+
+  // Eventos de tarjetas
+  document.querySelectorAll('.crm-btn-ver').forEach(btn => {
+    btn.addEventListener('click', () => abrirModalCRM(btn.dataset.id));
+  });
+
+  document.querySelectorAll('.crm-btn-del').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (confirm('¿Eliminar este contacto?')) {
+        const data = getCRM().filter(c => c.id !== btn.dataset.id);
+        saveCRM(data);
+        renderCRM();
+        agregarActividad('◈', 'Contacto eliminado del CRM');
+      }
+    });
+  });
+}
+
+// ── Modal de contacto ──
+let crmContactoActivo = null;
+
+function abrirModalCRM(id) {
+  const data = getCRM();
+  const contacto = data.find(c => c.id === id);
+  if (!contacto) return;
+
+  crmContactoActivo = id;
+
+  const modal = document.getElementById('crm-modal');
+  const titulo = document.getElementById('crm-modal-titulo');
+  const info = document.getElementById('crm-modal-info');
+  const notas = document.getElementById('crm-notas-lista');
+
+  if (titulo) titulo.textContent = contacto.nombre + ' — ' + contacto.empresa;
+
+  if (info) info.innerHTML = `
+    <div class="crm-info-row"><span class="crm-info-label">SECTOR</span>${contacto.sector}</div>
+    <div class="crm-info-row"><span class="crm-info-label">TEL</span>
+      <a href="https://wa.me/${contacto.telefono.replace(/\D/g, '')}" target="_blank" style="color:#1DB954;">${contacto.telefono}</a>
+    </div>
+    <div class="crm-info-row"><span class="crm-info-label">ETAPA</span>${contacto.etapa.toUpperCase()}</div>
+    <div class="crm-info-row"><span class="crm-info-label">CREADO</span>${contacto.fecha}</div>
+  `;
+
+  if (notas) {
+    notas.innerHTML = '';
+    (contacto.notas || []).forEach(n => {
+      const div = document.createElement('div');
+      div.classList.add('crm-nota-item');
+      div.innerHTML = `<span class="crm-nota-fecha">${n.fecha}</span> ${n.texto}`;
+      notas.appendChild(div);
+    });
+    if (!contacto.notas?.length) notas.innerHTML = '<div class="crm-nota-vacia">Sin notas aún.</div>';
+  }
+
+  if (modal) modal.style.display = 'flex';
+}
+
+// ── Agregar nota ──
+const btnCRMNota = document.getElementById('btn-crm-nota');
+const crmNotaInput = document.getElementById('crm-nota-input');
+
+if (btnCRMNota) {
+  btnCRMNota.addEventListener('click', () => {
+    const texto = crmNotaInput?.value.trim();
+    if (!texto || !crmContactoActivo) return;
+
+    const data = getCRM();
+    const idx = data.findIndex(c => c.id === crmContactoActivo);
+    if (idx === -1) return;
+
+    if (!data[idx].notas) data[idx].notas = [];
+    data[idx].notas.push({ texto, fecha: new Date().toLocaleString('es-MX') });
+    saveCRM(data);
+
+    if (crmNotaInput) crmNotaInput.value = '';
+    abrirModalCRM(crmContactoActivo);
+    renderCRM();
+    agregarActividad('◈', 'Nota agregada: ' + data[idx].nombre);
+  });
+}
+
+if (crmNotaInput) {
+  crmNotaInput.addEventListener('keydown', e => { if (e.key === 'Enter') btnCRMNota?.click(); });
+}
+
+// ── Mover etapa ──
+document.querySelectorAll('.btn-etapa').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (!crmContactoActivo) return;
+    const data = getCRM();
+    const idx = data.findIndex(c => c.id === crmContactoActivo);
+    if (idx === -1) return;
+
+    const etapaAnterior = data[idx].etapa;
+    data[idx].etapa = btn.dataset.etapa;
+    data[idx].notas = data[idx].notas || [];
+    data[idx].notas.push({
+      texto: `Movido de ${etapaAnterior.toUpperCase()} a ${btn.dataset.etapa.toUpperCase()}`,
+      fecha: new Date().toLocaleString('es-MX')
+    });
+    saveCRM(data);
+
+    document.getElementById('crm-modal').style.display = 'none';
+    renderCRM();
+    agregarActividad('◈', `${data[idx].nombre} → ${btn.dataset.etapa.toUpperCase()}`);
+  });
+});
+
+// ── Cerrar modal ──
+const btnCerrarModal = document.getElementById('crm-modal-cerrar');
+if (btnCerrarModal) {
+  btnCerrarModal.addEventListener('click', () => {
+    document.getElementById('crm-modal').style.display = 'none';
+    crmContactoActivo = null;
+  });
+}
+
+const crmModal = document.getElementById('crm-modal');
+if (crmModal) {
+  crmModal.addEventListener('click', e => {
+    if (e.target === crmModal) {
+      crmModal.style.display = 'none';
+      crmContactoActivo = null;
+    }
+  });
+}
+
+// ── Agregar contacto ──
+const btnCRMAgregar = document.getElementById('btn-crm-agregar');
+
+if (btnCRMAgregar) {
+  btnCRMAgregar.addEventListener('click', () => {
+    const nombre = document.getElementById('crm-f-nombre')?.value.trim();
+    const empresa = document.getElementById('crm-f-empresa')?.value.trim();
+    const telefono = document.getElementById('crm-f-telefono')?.value.trim();
+    const sector = document.getElementById('crm-f-sector')?.value;
+    const nota = document.getElementById('crm-f-nota')?.value.trim();
+
+    if (!nombre || !empresa || !telefono || !sector) {
+      alert('Nombre, empresa, teléfono y sector son obligatorios.');
+      return;
+    }
+
+    const nuevo = {
+      id: crmNuevoId(),
+      nombre, empresa, telefono, sector,
+      etapa: 'nuevo',
+      fecha: new Date().toLocaleString('es-MX'),
+      notas: nota ? [{ texto: nota, fecha: new Date().toLocaleString('es-MX') }] : []
+    };
+
+    const data = getCRM();
+    data.unshift(nuevo);
+    saveCRM(data);
+
+    // Limpiar form
+    ['crm-f-nombre', 'crm-f-empresa', 'crm-f-telefono', 'crm-f-nota'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    const sel = document.getElementById('crm-f-sector');
+    if (sel) sel.selectedIndex = 0;
+
+    renderCRM();
+    agregarActividad('◈', 'Nuevo lead CRM: ' + nombre);
+  });
+}
+
+// ── Exportar CRM ──
+const btnExportarCRM = document.getElementById('btn-exportar-crm');
+if (btnExportarCRM) {
+  btnExportarCRM.addEventListener('click', () => {
+    const data = getCRM();
+    if (!data.length) return;
+
+    let txt = `CRM JARVIS — ${new Date().toLocaleString('es-MX')}\n${'='.repeat(60)}\n\n`;
+    ETAPAS.forEach(etapa => {
+      const grupo = data.filter(c => c.etapa === etapa);
+      if (!grupo.length) return;
+      txt += `\n── ${etapa.toUpperCase()} (${grupo.length}) ──\n`;
+      grupo.forEach(c => {
+        txt += `  ${c.nombre} | ${c.empresa} | ${c.sector} | ${c.telefono}\n`;
+        if (c.notas?.length) {
+          c.notas.forEach(n => txt += `    → ${n.fecha}: ${n.texto}\n`);
+        }
+      });
+    });
+
+    const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `crm-jarvis-${Date.now()}.txt`;
+    a.click();
+    agregarActividad('◈', 'CRM exportado');
+  });
+}
+
+// ── Init CRM cuando se abre la sección ──
+const navCRM = document.querySelector('[data-section="crm"]');
+if (navCRM) {
+  navCRM.addEventListener('click', () => renderCRM());
+}
+
+// ── CSS del CRM (inyectado en <head> automáticamente) ──────────
+const crmStyles = document.createElement('style');
+crmStyles.textContent = `
+  #crm-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border, #1a2a4a);
+    margin-bottom: 2rem;
+  }
+  .crm-stat {
+    background: var(--bg, #0a0a0f);
+    padding: 1rem;
+    text-align: center;
+  }
+  .crm-stat-green .crm-stat-num { color: #1DB954; }
+  .crm-stat-num {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--c, #3a7fff);
+    display: block;
+  }
+  .crm-stat-label {
+    font-size: 0.55rem;
+    letter-spacing: 2px;
+    color: var(--text-dim, #4a6a8a);
+    margin-top: 0.3rem;
+  }
+
+  #crm-form-wrap {
+    background: rgba(58,127,255,0.04);
+    border: 1px solid var(--border, #1a2a4a);
+    padding: 1.2rem;
+    margin-bottom: 2rem;
+  }
+  .crm-form-title {
+    font-size: 0.6rem;
+    letter-spacing: 3px;
+    color: var(--c, #3a7fff);
+    margin-bottom: 1rem;
+  }
+  #crm-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+    margin-bottom: 0.8rem;
+  }
+  .crm-input {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border, #1a2a4a);
+    color: #c8d8f0;
+    font-family: 'Space Mono', 'Courier New', monospace;
+    font-size: 0.75rem;
+    padding: 0.6rem 0.8rem;
+    outline: none;
+    width: 100%;
+    transition: border-color 0.2s;
+  }
+  .crm-input:focus { border-color: var(--c, #3a7fff); }
+  .crm-input::placeholder { color: #2a4a6a; }
+  .crm-input-full { grid-column: 1 / -1; }
+  .crm-select { cursor: pointer; }
+  .crm-select option { background: #0d0d18; }
+
+  #btn-crm-agregar {
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    background: var(--c, #3a7fff);
+    color: #0a0a0f;
+    border: none;
+    padding: 0.6rem 1.4rem;
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    transition: opacity 0.2s;
+  }
+  #btn-crm-agregar:hover { opacity: 0.85; }
+
+  #crm-pipeline {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(180px, 1fr));
+    gap: 1px;
+    background: var(--border, #1a2a4a);
+    overflow-x: auto;
+    min-height: 300px;
+  }
+  .crm-col {
+    background: var(--bg, #0a0a0f);
+    min-height: 300px;
+  }
+  .crm-col-header {
+    padding: 0.8rem;
+    font-size: 0.58rem;
+    letter-spacing: 2px;
+    color: #4a6a8a;
+    border-bottom: 1px solid var(--border, #1a2a4a);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: sticky;
+    top: 0;
+    background: var(--bg, #0a0a0f);
+    z-index: 1;
+  }
+  .crm-col-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .crm-col-count {
+    margin-left: auto;
+    background: rgba(58,127,255,0.15);
+    color: var(--c, #3a7fff);
+    font-size: 0.55rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 2px;
+  }
+  .crm-cards { padding: 0.6rem; display: flex; flex-direction: column; gap: 0.5rem; }
+
+  .crm-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border, #1a2a4a);
+    padding: 0.8rem;
+    transition: border-color 0.2s;
+    cursor: default;
+  }
+  .crm-card:hover { border-color: var(--c, #3a7fff); }
+  .crm-card-nombre {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #c8d8f0;
+    margin-bottom: 0.2rem;
+  }
+  .crm-card-empresa { font-size: 0.65rem; color: #4a6a8a; margin-bottom: 0.2rem; }
+  .crm-card-sector {
+    font-size: 0.55rem;
+    letter-spacing: 1.5px;
+    color: var(--c, #3a7fff);
+    margin-bottom: 0.5rem;
+  }
+  .crm-card-nota-preview {
+    font-size: 0.62rem;
+    color: #2a4a6a;
+    margin-bottom: 0.5rem;
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .crm-card-actions { display: flex; gap: 0.4rem; }
+  .crm-btn-wa, .crm-btn-ver, .crm-btn-del {
+    font-size: 0.55rem;
+    letter-spacing: 1px;
+    padding: 0.2rem 0.5rem;
+    border: 1px solid var(--border, #1a2a4a);
+    background: none;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .crm-btn-wa  { color: #1DB954; border-color: #1DB95433; }
+  .crm-btn-wa:hover { background: rgba(29,185,84,0.1); }
+  .crm-btn-ver { color: var(--c, #3a7fff); }
+  .crm-btn-ver:hover { background: rgba(58,127,255,0.1); border-color: var(--c, #3a7fff); }
+  .crm-btn-del { color: #ff4444; border-color: #ff444433; }
+  .crm-btn-del:hover { background: rgba(255,68,68,0.1); }
+
+  /* Modal */
+  #crm-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+  #crm-modal-inner {
+    background: #0d0d18;
+    border: 1px solid var(--border, #1a2a4a);
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 560px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  #crm-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid var(--border, #1a2a4a);
+  }
+  #crm-modal-titulo {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    color: var(--c, #3a7fff);
+  }
+  #crm-modal-cerrar {
+    background: none;
+    border: 1px solid #1a2a4a;
+    color: #4a6a8a;
+    font-size: 0.65rem;
+    padding: 0.3rem 0.6rem;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  #crm-modal-cerrar:hover { border-color: #ff4444; color: #ff4444; }
+  .crm-info-row {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.72rem;
+    color: #4a6a8a;
+    margin-bottom: 0.4rem;
+  }
+  .crm-info-label {
+    font-size: 0.55rem;
+    letter-spacing: 2px;
+    color: var(--c, #3a7fff);
+    min-width: 70px;
+  }
+  #crm-notas-lista {
+    margin: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  .crm-nota-item {
+    font-size: 0.68rem;
+    color: #6a8aaa;
+    padding: 0.4rem 0.6rem;
+    border-left: 2px solid var(--border, #1a2a4a);
+  }
+  .crm-nota-fecha {
+    color: #2a4a6a;
+    font-size: 0.6rem;
+    margin-right: 0.5rem;
+  }
+  .crm-nota-vacia { font-size: 0.65rem; color: #2a4a6a; padding: 0.5rem; }
+  #crm-nota-input-area {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  #btn-crm-nota {
+    font-size: 0.6rem;
+    letter-spacing: 1.5px;
+    background: var(--c, #3a7fff);
+    color: #0a0a0f;
+    border: none;
+    padding: 0.5rem 0.8rem;
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  #crm-modal-mover {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border, #1a2a4a);
+  }
+  .crm-modal-label {
+    font-size: 0.55rem;
+    letter-spacing: 2px;
+    color: #2a4a6a;
+    margin-right: 0.3rem;
+  }
+  .btn-etapa {
+    font-size: 0.55rem;
+    letter-spacing: 1.5px;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--border, #1a2a4a);
+    background: none;
+    color: #4a6a8a;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .btn-etapa:hover { border-color: var(--c, #3a7fff); color: var(--c, #3a7fff); }
+
+  @media (max-width: 900px) {
+    #crm-stats { grid-template-columns: repeat(2, 1fr); }
+    #crm-pipeline { grid-template-columns: repeat(2, 1fr); }
+    #crm-form-grid { grid-template-columns: 1fr; }
+  }
+`;
+document.head.appendChild(crmStyles);
+
+// Render inicial si ya estamos en esa sección
+if (document.getElementById('sec-crm')?.classList.contains('active')) renderCRM();
