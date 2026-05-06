@@ -1192,23 +1192,20 @@
       btnSubmit.disabled = true;
       btnSubmit.textContent = '[ ENVIANDO... ]';
 
-      const lead = {
-        id: Date.now(),
-        fecha: new Date().toLocaleString('es-MX'),
-        nombre: document.getElementById('f-nombre').value.trim(),
-        empresa: document.getElementById('f-empresa').value.trim(),
-        telefono: document.getElementById('f-telefono').value.trim(),
-        sector: document.getElementById('f-sector').value,
-        problema: document.getElementById('f-problema').value.trim(),
-      };
+      const nombre = document.getElementById('f-nombre').value.trim();
+      const empresa = document.getElementById('f-empresa').value.trim();
+      const telefono = document.getElementById('f-telefono').value.trim();
+      const sector = document.getElementById('f-sector').value;
+      const problema = document.getElementById('f-problema').value.trim();
 
-      const leads = getLeads();
-      leads.unshift(lead);
-      saveLeads(leads);
+      const mensaje = `🤖 *NUEVO LEAD — JARVIS*\n\n*Nombre:* ${nombre}\n*Empresa:* ${empresa}\n*Teléfono:* ${telefono}\n*Sector:* ${sector}\n*Problema:* ${problema || 'No especificado'}`;
+
+      const url = `https://wa.me/5651252365?text=${encodeURIComponent(mensaje)}`;
 
       setTimeout(() => {
         form.style.display = 'none';
         successMsg.style.display = 'block';
+        window.open(url, '_blank');
       }, 800);
     });
 
