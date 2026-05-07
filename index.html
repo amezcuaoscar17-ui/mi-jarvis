@@ -82,519 +82,522 @@
         <div class="nav-item" data-section="crm">
           <span class="nav-icon">◈</span>
           <span class="nav-label">CRM</span>
-        </div> <span class="nav-icon">◈</span>
-        <span class="nav-label">Ajustes</span>
-  </div>
-  </nav>
-
-  <div id="sidebar-user">
-    <div id="sidebar-user-avatar">O</div>
-    <div id="sidebar-user-info">
-      <div id="sidebar-user-name">Óscar</div>
-      <div id="sidebar-user-plan">Premium</div>
-    </div>
-  </div>
-  </aside>
-
-  <!-- Área principal -->
-  <main id="main">
-
-    <!-- Topbar -->
-    <div id="topbar">
-      <div id="topbar-left">
-        <button id="sidebar-toggle">☰</button>
-      </div>
-      <div id="topbar-right">
-        <button id="btn-briefing" title="Daily Briefing">☀ BRIEFING</button>
-        <button id="btn-search-top">⌕</button>
-        <button id="btn-notif">🔔</button>
-        <button id="btn-config" title="Ajustes">[ SYS ]</button>
-      </div>
-    </div>
-
-    <!-- Secciones -->
-    <div id="sections">
-
-      <!-- INICIO -->
-      <section id="sec-inicio" class="section active">
-        <div id="inicio-header">
-          <div id="inicio-greeting">Hola, <span id="greeting-name">Óscar</span>.</div>
-          <h1 id="inicio-title">Soy <span class="highlight">Jarvis</span>,<br />¿Qué quieres hacer hoy?</h1>
         </div>
+        <div class="nav-item" data-section="ajustes">
+          <span class="nav-icon">◈</span>
+          <span class="nav-label">Ajustes</span>
+        </div>
+      </nav>
 
-        <div id="input-central">
-          <input type="text" id="chat-input" placeholder="Escribe aquí lo que necesitas..." />
-          <div id="input-actions">
-            <label id="btn-adjuntar" title="Adjuntar">
+      <div id="sidebar-user">
+        <div id="sidebar-user-avatar">O</div>
+        <div id="sidebar-user-info">
+          <div id="sidebar-user-name">Óscar</div>
+          <div id="sidebar-user-plan">Premium</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Área principal -->
+    <main id="main">
+
+      <!-- Topbar -->
+      <div id="topbar">
+        <div id="topbar-left">
+          <button id="sidebar-toggle">☰</button>
+        </div>
+        <div id="topbar-right">
+          <button id="btn-briefing" title="Daily Briefing">☀ BRIEFING</button>
+          <button id="btn-search-top">⌕</button>
+          <button id="btn-notif">🔔</button>
+          <button id="btn-config" title="Ajustes">[ SYS ]</button>
+        </div>
+      </div>
+
+      <!-- Secciones -->
+      <div id="sections">
+
+        <!-- INICIO -->
+        <section id="sec-inicio" class="section active">
+          <div id="inicio-header">
+            <div id="inicio-greeting">Hola, <span id="greeting-name">Óscar</span>.</div>
+            <h1 id="inicio-title">Soy <span class="highlight">Jarvis</span>,<br />¿Qué quieres hacer hoy?</h1>
+          </div>
+
+          <div id="input-central">
+            <input type="text" id="chat-input" placeholder="Escribe aquí lo que necesitas..." />
+            <div id="input-actions">
+              <label id="btn-adjuntar" title="Adjuntar">
+                📎
+                <input type="file" id="file-input" accept="image/*,video/*,.pdf,.doc,.docx" style="display:none;" />
+              </label>
+              <button id="btn-mic">🎤</button>
+              <button id="btn-send">[ TX ]</button>
+            </div>
+          </div>
+
+          <div id="acciones-rapidas">
+            <div class="accion-card" onclick="cambiarSeccion('vision')">
+              <div class="accion-icon">◎</div>
+              <div class="accion-label">Visión IA</div>
+            </div>
+            <div class="accion-card" onclick="cambiarSeccion('imagenes')">
+              <div class="accion-icon">◻</div>
+              <div class="accion-label">Generar imagen</div>
+            </div>
+            <div class="accion-card" onclick="cambiarSeccion('documentos')">
+              <div class="accion-icon">▤</div>
+              <div class="accion-label">Documentos</div>
+            </div>
+            <div class="accion-card" onclick="cambiarSeccion('musica')">
+              <div class="accion-icon">♪</div>
+              <div class="accion-label">Música</div>
+            </div>
+            <div class="accion-card" onclick="cambiarSeccion('tareas')">
+              <div class="accion-icon">✓</div>
+              <div class="accion-label">Tareas</div>
+            </div>
+          </div>
+
+          <div id="funciones-grid">
+            <div class="funcion-card" onclick="cambiarSeccion('chat')">
+              <div class="funcion-icon">◈</div>
+              <div class="funcion-titulo">Chat inteligente</div>
+              <div class="funcion-desc">Conversa con Jarvis sobre cualquier tema con memoria y contexto.</div>
+              <div class="funcion-arrow">→</div>
+            </div>
+            <div class="funcion-card" onclick="cambiarSeccion('vision')">
+              <div class="funcion-icon">◎</div>
+              <div class="funcion-titulo">Visión por IA</div>
+              <div class="funcion-desc">Analiza imágenes, describe escenas y lee texto con la cámara.</div>
+              <div class="funcion-arrow">→</div>
+            </div>
+            <div class="funcion-card" onclick="cambiarSeccion('documentos')">
+              <div class="funcion-icon">▤</div>
+              <div class="funcion-titulo">Documentos</div>
+              <div class="funcion-desc">Sube PDFs y documentos Word para que Jarvis los analice.</div>
+              <div class="funcion-arrow">→</div>
+            </div>
+            <div class="funcion-card" onclick="cambiarSeccion('imagenes')">
+              <div class="funcion-icon">◻</div>
+              <div class="funcion-titulo">Generar imágenes</div>
+              <div class="funcion-desc">Crea imágenes con IA describiendo lo que imaginas.</div>
+              <div class="funcion-arrow">→</div>
+            </div>
+            <div class="funcion-card" onclick="cambiarSeccion('musica')">
+              <div class="funcion-icon">♪</div>
+              <div class="funcion-titulo">Control musical</div>
+              <div class="funcion-desc">Controla Spotify con tu voz. Reproduce, pausa y cambia canciones.</div>
+              <div class="funcion-arrow">→</div>
+            </div>
+            <div class="funcion-card" onclick="cambiarSeccion('memoria')">
+              <div class="funcion-icon">◉</div>
+              <div class="funcion-titulo">Memoria personal</div>
+              <div class="funcion-desc">Jarvis recuerda tus preferencias, nombre y conversaciones.</div>
+              <div class="funcion-arrow">→</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CHAT -->
+        <section id="sec-chat" class="section">
+          <div class="section-header">
+            <h2 class="section-title">[ CHAT ]</h2>
+            <button id="btn-manos-libres">[ LIVE ]</button>
+          </div>
+          <div id="chat-mensajes"></div>
+          <div id="preview-adjunto" style="display:none;">
+            <div id="preview-contenido"></div>
+            <button id="btn-quitar-adjunto">[ X ]</button>
+          </div>
+          <div id="chat-input-area">
+            <label id="btn-adjuntar-chat" title="Adjuntar">
               📎
-              <input type="file" id="file-input" accept="image/*,video/*,.pdf,.doc,.docx" style="display:none;" />
+              <input type="file" id="file-input-chat" accept="image/*,video/*,.pdf,.doc,.docx" style="display:none;" />
             </label>
-            <button id="btn-mic">🎤</button>
-            <button id="btn-send">[ TX ]</button>
+            <input type="text" id="chat-input-chat" placeholder="Escribe a Jarvis..." />
+            <button id="btn-send-chat">[ TX ]</button>
           </div>
-        </div>
+        </section>
 
-        <div id="acciones-rapidas">
-          <div class="accion-card" onclick="cambiarSeccion('vision')">
-            <div class="accion-icon">◎</div>
-            <div class="accion-label">Visión IA</div>
+        <!-- VISIÓN -->
+        <section id="sec-vision" class="section">
+          <div class="section-header">
+            <h2 class="section-title">[ VISIÓN ]</h2>
+            <button id="btn-cam">[ CAM ]</button>
+            <button id="btn-capture" style="display:none;">[ SNAP ]</button>
           </div>
-          <div class="accion-card" onclick="cambiarSeccion('imagenes')">
-            <div class="accion-icon">◻</div>
-            <div class="accion-label">Generar imagen</div>
-          </div>
-          <div class="accion-card" onclick="cambiarSeccion('documentos')">
-            <div class="accion-icon">▤</div>
-            <div class="accion-label">Documentos</div>
-          </div>
-          <div class="accion-card" onclick="cambiarSeccion('musica')">
-            <div class="accion-icon">♪</div>
-            <div class="accion-label">Música</div>
-          </div>
-          <div class="accion-card" onclick="cambiarSeccion('tareas')">
-            <div class="accion-icon">✓</div>
-            <div class="accion-label">Tareas</div>
-          </div>
-        </div>
+          <video id="cam-preview" autoplay playsinline muted
+            style="width:100%;max-width:500px;border-radius:8px;display:none;"></video>
+          <div id="vision-response"></div>
+        </section>
 
-        <div id="funciones-grid">
-          <div class="funcion-card" onclick="cambiarSeccion('chat')">
-            <div class="funcion-icon">◈</div>
-            <div class="funcion-titulo">Chat inteligente</div>
-            <div class="funcion-desc">Conversa con Jarvis sobre cualquier tema con memoria y contexto.</div>
-            <div class="funcion-arrow">→</div>
+        <!-- DOCUMENTOS -->
+        <section id="sec-documentos" class="section">
+          <div class="section-header">
+            <h2 class="section-title">[ DOCUMENTOS ]</h2>
           </div>
-          <div class="funcion-card" onclick="cambiarSeccion('vision')">
-            <div class="funcion-icon">◎</div>
-            <div class="funcion-titulo">Visión por IA</div>
-            <div class="funcion-desc">Analiza imágenes, describe escenas y lee texto con la cámara.</div>
-            <div class="funcion-arrow">→</div>
+          <div id="doc-upload-area">
+            <label id="doc-upload-label">
+              <input type="file" id="doc-file-input" accept=".pdf,.doc,.docx" style="display:none;" />
+              <div id="doc-upload-box">
+                <div class="doc-upload-icon">▤</div>
+                <div class="doc-upload-text">Arrastra o haz clic para subir PDF o Word</div>
+              </div>
+            </label>
           </div>
-          <div class="funcion-card" onclick="cambiarSeccion('documentos')">
-            <div class="funcion-icon">▤</div>
-            <div class="funcion-titulo">Documentos</div>
-            <div class="funcion-desc">Sube PDFs y documentos Word para que Jarvis los analice.</div>
-            <div class="funcion-arrow">→</div>
+          <div id="doc-preview"></div>
+          <div id="doc-question-area" style="display:none;">
+            <input type="text" id="doc-question" placeholder="Haz una pregunta sobre el documento..." />
+            <button id="doc-ask">[ ANALIZAR ]</button>
           </div>
-          <div class="funcion-card" onclick="cambiarSeccion('imagenes')">
-            <div class="funcion-icon">◻</div>
-            <div class="funcion-titulo">Generar imágenes</div>
-            <div class="funcion-desc">Crea imágenes con IA describiendo lo que imaginas.</div>
-            <div class="funcion-arrow">→</div>
-          </div>
-          <div class="funcion-card" onclick="cambiarSeccion('musica')">
-            <div class="funcion-icon">♪</div>
-            <div class="funcion-titulo">Control musical</div>
-            <div class="funcion-desc">Controla Spotify con tu voz. Reproduce, pausa y cambia canciones.</div>
-            <div class="funcion-arrow">→</div>
-          </div>
-          <div class="funcion-card" onclick="cambiarSeccion('memoria')">
-            <div class="funcion-icon">◉</div>
-            <div class="funcion-titulo">Memoria personal</div>
-            <div class="funcion-desc">Jarvis recuerda tus preferencias, nombre y conversaciones.</div>
-            <div class="funcion-arrow">→</div>
-          </div>
-        </div>
-      </section>
+          <div id="doc-response"></div>
+        </section>
 
-      <!-- CHAT -->
-      <section id="sec-chat" class="section">
-        <div class="section-header">
-          <h2 class="section-title">[ CHAT ]</h2>
-          <button id="btn-manos-libres">[ LIVE ]</button>
-        </div>
-        <div id="chat-mensajes"></div>
-        <div id="preview-adjunto" style="display:none;">
-          <div id="preview-contenido"></div>
-          <button id="btn-quitar-adjunto">[ X ]</button>
-        </div>
-        <div id="chat-input-area">
-          <label id="btn-adjuntar-chat" title="Adjuntar">
-            📎
-            <input type="file" id="file-input-chat" accept="image/*,video/*,.pdf,.doc,.docx" style="display:none;" />
-          </label>
-          <input type="text" id="chat-input-chat" placeholder="Escribe a Jarvis..." />
-          <button id="btn-send-chat">[ TX ]</button>
-        </div>
-      </section>
+        <!-- IMÁGENES -->
+        <section id="sec-imagenes" class="section">
+          <div class="section-header">
+            <h2 class="section-title">[ IMÁGENES ]</h2>
+          </div>
+          <div id="img-input-area">
+            <input type="text" id="img-prompt" placeholder="Describe la imagen que quieres generar..." />
+            <button id="img-generar">[ GENERAR ]</button>
+          </div>
+          <div id="img-gallery"></div>
+        </section>
 
-      <!-- VISIÓN -->
-      <section id="sec-vision" class="section">
-        <div class="section-header">
-          <h2 class="section-title">[ VISIÓN ]</h2>
-          <button id="btn-cam">[ CAM ]</button>
-          <button id="btn-capture" style="display:none;">[ SNAP ]</button>
-        </div>
-        <video id="cam-preview" autoplay playsinline muted
-          style="width:100%;max-width:500px;border-radius:8px;display:none;"></video>
-        <div id="vision-response"></div>
-      </section>
+        <!-- MÚSICA -->
+        <section id="sec-musica" class="section">
+          <div class="section-header">
+            <h2 class="section-title">[ MÚSICA ]</h2>
+            <button id="btn-spotify-connect">[ CONECTAR SPOTIFY ]</button>
+          </div>
+          <div id="musica-input-area">
+            <input type="text" id="musica-query" placeholder="¿Qué quieres escuchar?" />
+            <button id="musica-play">[ PLAY ]</button>
+          </div>
+          <div id="musica-controls">
+            <button id="musica-pause">[ PAUSE ]</button>
+            <button id="musica-next">[ NEXT ]</button>
+            <button id="musica-resume">[ RESUME ]</button>
+          </div>
+          <div id="musica-status"></div>
+        </section>
 
-      <!-- DOCUMENTOS -->
-      <section id="sec-documentos" class="section">
-        <div class="section-header">
-          <h2 class="section-title">[ DOCUMENTOS ]</h2>
-        </div>
-        <div id="doc-upload-area">
-          <label id="doc-upload-label">
-            <input type="file" id="doc-file-input" accept=".pdf,.doc,.docx" style="display:none;" />
-            <div id="doc-upload-box">
-              <div class="doc-upload-icon">▤</div>
-              <div class="doc-upload-text">Arrastra o haz clic para subir PDF o Word</div>
+        <!-- TAREAS -->
+        <section id="sec-tareas" class="section">
+          <div class="section-header">
+            <h2 class="section-title">[ TAREAS ]</h2>
+          </div>
+          <div id="tareas-input">
+            <input type="text" id="tarea-nueva" placeholder="Nueva tarea..." />
+            <button id="tarea-agregar">[ + ]</button>
+          </div>
+          <div id="tareas-lista"></div>
+        </section>
+
+        <!-- MEMORIA -->
+        <section id="sec-memoria" class="section">
+          <div class="section-header">
+            <h2 class="section-title">[ MEMORIA ]</h2>
+            <button id="btn-historial">[ LOG ]</button>
+          </div>
+          <div id="memoria-contenido"></div>
+        </section>
+
+        <!-- PROSPECCIÓN -->
+        <section id="sec-prospeccion" class="section">
+          <div class="section-header">
+            <h2 class="section-title">[ PROSPECCIÓN ]</h2>
+            <button id="btn-exportar-prospectos">[ EXPORTAR ]</button>
+          </div>
+
+          <div id="prosp-form">
+            <div class="prosp-form-row">
+              <input type="text" id="prosp-ciudad" placeholder="Ciudad (ej: Monterrey)" />
+              <input type="text" id="prosp-rubro" placeholder="Ramo (ej: restaurantes, clínicas)" />
+              <button id="btn-buscar-prospectos">[ BUSCAR ]</button>
             </div>
-          </label>
-        </div>
-        <div id="doc-preview"></div>
-        <div id="doc-question-area" style="display:none;">
-          <input type="text" id="doc-question" placeholder="Haz una pregunta sobre el documento..." />
-          <button id="doc-ask">[ ANALIZAR ]</button>
-        </div>
-        <div id="doc-response"></div>
-      </section>
-
-      <!-- IMÁGENES -->
-      <section id="sec-imagenes" class="section">
-        <div class="section-header">
-          <h2 class="section-title">[ IMÁGENES ]</h2>
-        </div>
-        <div id="img-input-area">
-          <input type="text" id="img-prompt" placeholder="Describe la imagen que quieres generar..." />
-          <button id="img-generar">[ GENERAR ]</button>
-        </div>
-        <div id="img-gallery"></div>
-      </section>
-
-      <!-- MÚSICA -->
-      <section id="sec-musica" class="section">
-        <div class="section-header">
-          <h2 class="section-title">[ MÚSICA ]</h2>
-          <button id="btn-spotify-connect">[ CONECTAR SPOTIFY ]</button>
-        </div>
-        <div id="musica-input-area">
-          <input type="text" id="musica-query" placeholder="¿Qué quieres escuchar?" />
-          <button id="musica-play">[ PLAY ]</button>
-        </div>
-        <div id="musica-controls">
-          <button id="musica-pause">[ PAUSE ]</button>
-          <button id="musica-next">[ NEXT ]</button>
-          <button id="musica-resume">[ RESUME ]</button>
-        </div>
-        <div id="musica-status"></div>
-      </section>
-
-      <!-- TAREAS -->
-      <section id="sec-tareas" class="section">
-        <div class="section-header">
-          <h2 class="section-title">[ TAREAS ]</h2>
-        </div>
-        <div id="tareas-input">
-          <input type="text" id="tarea-nueva" placeholder="Nueva tarea..." />
-          <button id="tarea-agregar">[ + ]</button>
-        </div>
-        <div id="tareas-lista"></div>
-      </section>
-
-      <!-- MEMORIA -->
-      <section id="sec-memoria" class="section">
-        <div class="section-header">
-          <h2 class="section-title">[ MEMORIA ]</h2>
-          <button id="btn-historial">[ LOG ]</button>
-        </div>
-        <div id="memoria-contenido"></div>
-      </section>
-
-      <!-- PROSPECCIÓN -->
-      <section id="sec-prospeccion" class="section">
-        <div class="section-header">
-          <h2 class="section-title">[ PROSPECCIÓN ]</h2>
-          <button id="btn-exportar-prospectos">[ EXPORTAR ]</button>
-        </div>
-
-        <div id="prosp-form">
-          <div class="prosp-form-row">
-            <input type="text" id="prosp-ciudad" placeholder="Ciudad (ej: Monterrey)" />
-            <input type="text" id="prosp-rubro" placeholder="Ramo (ej: restaurantes, clínicas)" />
-            <button id="btn-buscar-prospectos">[ BUSCAR ]</button>
-          </div>
-          <div id="prosp-filtros">
-            <span class="prosp-filtro-label">Filtros de oportunidad:</span>
-            <label class="prosp-filtro"><input type="checkbox" id="filtro-sin-chatbot" checked> Sin chatbot</label>
-            <label class="prosp-filtro"><input type="checkbox" id="filtro-web-vieja" checked> Web
-              desactualizada</label>
-            <label class="prosp-filtro"><input type="checkbox" id="filtro-poca-presencia" checked> Poca presencia
-              digital</label>
-          </div>
-        </div>
-
-        <div id="prosp-status"></div>
-        <div id="prospectos-lista"></div>
-      </section>
-
-      <!-- CRM — PIPELINE DE VENTAS -->
-      <section id="sec-crm" class="section">
-        <div class="section-header">
-          <h2 class="section-title">[ CRM ]</h2>
-          <button id="btn-exportar-crm">[ EXPORTAR ]</button>
-        </div>
-
-        <!-- Stats rápidas -->
-        <div id="crm-stats">
-          <div class="crm-stat">
-            <div class="crm-stat-num" id="crm-total">0</div>
-            <div class="crm-stat-label">TOTAL</div>
-          </div>
-          <div class="crm-stat">
-            <div class="crm-stat-num" id="crm-contactados">0</div>
-            <div class="crm-stat-label">CONTACTADOS</div>
-          </div>
-          <div class="crm-stat">
-            <div class="crm-stat-num" id="crm-demos">0</div>
-            <div class="crm-stat-label">DEMOS</div>
-          </div>
-          <div class="crm-stat crm-stat-green">
-            <div class="crm-stat-num" id="crm-cerrados">0</div>
-            <div class="crm-stat-label">CERRADOS</div>
-          </div>
-        </div>
-
-        <!-- Formulario nuevo contacto -->
-        <div id="crm-form-wrap">
-          <div class="crm-form-title">+ NUEVO CONTACTO</div>
-          <div id="crm-form-grid">
-            <input type="text" id="crm-f-nombre" class="crm-input" placeholder="Nombre" />
-            <input type="text" id="crm-f-empresa" class="crm-input" placeholder="Empresa / Negocio" />
-            <input type="tel" id="crm-f-telefono" class="crm-input" placeholder="WhatsApp / Tel" />
-            <select id="crm-f-sector" class="crm-input crm-select">
-              <option value="" disabled selected>Sector</option>
-              <option value="Inmobiliario">Inmobiliario</option>
-              <option value="Marketing">Marketing</option>
-              <option value="Hotel">Hotel / Hospedaje</option>
-              <option value="Restaurante">Restaurante</option>
-              <option value="Retail">Retail</option>
-              <option value="Servicios">Servicios</option>
-              <option value="Otro">Otro</option>
-            </select>
-            <input type="text" id="crm-f-nota" class="crm-input crm-input-full" placeholder="Nota inicial (opcional)" />
-          </div>
-          <button id="btn-crm-agregar">[ + AGREGAR AL PIPELINE ]</button>
-        </div>
-
-        <!-- Pipeline kanban -->
-        <div id="crm-pipeline">
-
-          <div class="crm-col" id="crm-col-nuevo">
-            <div class="crm-col-header">
-              <span class="crm-col-dot" style="background:#4a6a9a;"></span>
-              NUEVO
-              <span class="crm-col-count" id="cnt-nuevo">0</span>
-            </div>
-            <div class="crm-cards" id="cards-nuevo"></div>
-          </div>
-
-          <div class="crm-col" id="crm-col-contactado">
-            <div class="crm-col-header">
-              <span class="crm-col-dot" style="background:#3a7fff;"></span>
-              CONTACTADO
-              <span class="crm-col-count" id="cnt-contactado">0</span>
-            </div>
-            <div class="crm-cards" id="cards-contactado"></div>
-          </div>
-
-          <div class="crm-col" id="crm-col-demo">
-            <div class="crm-col-header">
-              <span class="crm-col-dot" style="background:#f59e0b;"></span>
-              DEMO / REUNIÓN
-              <span class="crm-col-count" id="cnt-demo">0</span>
-            </div>
-            <div class="crm-cards" id="cards-demo"></div>
-          </div>
-
-          <div class="crm-col" id="crm-col-propuesta">
-            <div class="crm-col-header">
-              <span class="crm-col-dot" style="background:#a855f7;"></span>
-              PROPUESTA
-              <span class="crm-col-count" id="cnt-propuesta">0</span>
-            </div>
-            <div class="crm-cards" id="cards-propuesta"></div>
-          </div>
-
-          <div class="crm-col" id="crm-col-cerrado">
-            <div class="crm-col-header">
-              <span class="crm-col-dot" style="background:#1DB954;"></span>
-              CERRADO ✓
-              <span class="crm-col-count" id="cnt-cerrado">0</span>
-            </div>
-            <div class="crm-cards" id="cards-cerrado"></div>
-          </div>
-
-          <div class="crm-col" id="crm-col-perdido">
-            <div class="crm-col-header">
-              <span class="crm-col-dot" style="background:#ff4444;"></span>
-              PERDIDO
-              <span class="crm-col-count" id="cnt-perdido">0</span>
-            </div>
-            <div class="crm-cards" id="cards-perdido"></div>
-          </div>
-
-        </div>
-
-        <!-- Modal de notas -->
-        <div id="crm-modal" style="display:none;">
-          <div id="crm-modal-inner">
-            <div id="crm-modal-header">
-              <span id="crm-modal-titulo">CONTACTO</span>
-              <button id="crm-modal-cerrar">[ X ]</button>
-            </div>
-            <div id="crm-modal-info"></div>
-            <div id="crm-notas-lista"></div>
-            <div id="crm-nota-input-area">
-              <input type="text" id="crm-nota-input" class="crm-input" placeholder="Agregar nota de seguimiento..." />
-              <button id="btn-crm-nota">[ + NOTA ]</button>
-            </div>
-            <div id="crm-modal-mover">
-              <span class="crm-modal-label">MOVER A:</span>
-              <button class="btn-etapa" data-etapa="nuevo">NUEVO</button>
-              <button class="btn-etapa" data-etapa="contactado">CONTACTADO</button>
-              <button class="btn-etapa" data-etapa="demo">DEMO</button>
-              <button class="btn-etapa" data-etapa="propuesta">PROPUESTA</button>
-              <button class="btn-etapa" data-etapa="cerrado">CERRADO</button>
-              <button class="btn-etapa" data-etapa="perdido">PERDIDO</button>
+            <div id="prosp-filtros">
+              <span class="prosp-filtro-label">Filtros de oportunidad:</span>
+              <label class="prosp-filtro"><input type="checkbox" id="filtro-sin-chatbot" checked> Sin chatbot</label>
+              <label class="prosp-filtro"><input type="checkbox" id="filtro-web-vieja" checked> Web
+                desactualizada</label>
+              <label class="prosp-filtro"><input type="checkbox" id="filtro-poca-presencia" checked> Poca presencia
+                digital</label>
             </div>
           </div>
-        </div>
 
-      </section>
+          <div id="prosp-status"></div>
+          <div id="prospectos-lista"></div>
+        </section>
 
-      <section id="sec-ajustes" class="section">
-        <div class="section-header">
-          <h2 class="section-title">[ AJUSTES ]</h2>
-        </div>
-        <div class="config-grupo">
-          <label>Nombre del asistente</label>
-          <input type="text" id="cfg-nombre-asistente" placeholder="Jarvis" />
-        </div>
-        <div class="config-grupo">
-          <label>Tu nombre</label>
-          <input type="text" id="cfg-nombre-usuario" placeholder="Tu nombre" />
-        </div>
-        <div class="config-grupo">
-          <label>Color del tema</label>
-          <div id="cfg-colores">
-            <div class="color-opcion" data-color="#00d4ff" style="background:#00d4ff;"></div>
-            <div class="color-opcion" data-color="#00ff41" style="background:#00ff41;"></div>
-            <div class="color-opcion" data-color="#a855f7" style="background:#a855f7;"></div>
-            <div class="color-opcion" data-color="#ef4444" style="background:#ef4444;"></div>
-            <div class="color-opcion" data-color="#f59e0b" style="background:#f59e0b;"></div>
-            <div class="color-opcion" data-color="#d4af37" style="background:#d4af37;"></div>
+        <!-- CRM — PIPELINE DE VENTAS -->
+        <section id="sec-crm" class="section">
+          <div class="section-header">
+            <h2 class="section-title">[ CRM ]</h2>
+            <button id="btn-exportar-crm">[ EXPORTAR ]</button>
           </div>
-        </div>
-        <div class="config-grupo">
-          <label>Velocidad de voz: <span id="cfg-velocidad-val">1.0</span></label>
-          <input type="range" id="cfg-velocidad" min="0.5" max="2" step="0.1" value="1.0" />
-        </div>
-        <div class="config-grupo">
-          <label>Sector para Daily Briefing</label>
-          <input type="text" id="cfg-briefing-sector" placeholder="ej: tecnología, inmobiliaria, startups" />
-        </div>
-        <div class="config-grupo">
-          <button id="cfg-borrar-memoria" class="btn-peligro">[ RESET MEM ]</button>
-        </div>
-        <button id="cfg-guardar">[ GUARDAR ]</button>
-      </section>
 
-    </div>
-  </main>
+          <!-- Stats rápidas -->
+          <div id="crm-stats">
+            <div class="crm-stat">
+              <div class="crm-stat-num" id="crm-total">0</div>
+              <div class="crm-stat-label">TOTAL</div>
+            </div>
+            <div class="crm-stat">
+              <div class="crm-stat-num" id="crm-contactados">0</div>
+              <div class="crm-stat-label">CONTACTADOS</div>
+            </div>
+            <div class="crm-stat">
+              <div class="crm-stat-num" id="crm-demos">0</div>
+              <div class="crm-stat-label">DEMOS</div>
+            </div>
+            <div class="crm-stat crm-stat-green">
+              <div class="crm-stat-num" id="crm-cerrados">0</div>
+              <div class="crm-stat-label">CERRADOS</div>
+            </div>
+          </div>
 
-  <!-- Panel derecho -->
-  <aside id="panel-derecho">
+          <!-- Formulario nuevo contacto -->
+          <div id="crm-form-wrap">
+            <div class="crm-form-title">+ NUEVO CONTACTO</div>
+            <div id="crm-form-grid">
+              <input type="text" id="crm-f-nombre" class="crm-input" placeholder="Nombre" />
+              <input type="text" id="crm-f-empresa" class="crm-input" placeholder="Empresa / Negocio" />
+              <input type="tel" id="crm-f-telefono" class="crm-input" placeholder="WhatsApp / Tel" />
+              <select id="crm-f-sector" class="crm-input crm-select">
+                <option value="" disabled selected>Sector</option>
+                <option value="Inmobiliario">Inmobiliario</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Hotel">Hotel / Hospedaje</option>
+                <option value="Restaurante">Restaurante</option>
+                <option value="Retail">Retail</option>
+                <option value="Servicios">Servicios</option>
+                <option value="Otro">Otro</option>
+              </select>
+              <input type="text" id="crm-f-nota" class="crm-input crm-input-full"
+                placeholder="Nota inicial (opcional)" />
+            </div>
+            <button id="btn-crm-agregar">[ + AGREGAR AL PIPELINE ]</button>
+          </div>
 
-    <div id="status-card">
-      <div id="status-card-title">JARVIS STATUS</div>
-      <div id="status-avatar-wrap">
-        <div id="status-ring"></div>
-        <div id="status-ring2"></div>
-        <div id="status-ring3"></div>
-        <span id="status-letter">J</span>
+          <!-- Pipeline kanban -->
+          <div id="crm-pipeline">
+
+            <div class="crm-col" id="crm-col-nuevo">
+              <div class="crm-col-header">
+                <span class="crm-col-dot" style="background:#4a6a9a;"></span>
+                NUEVO
+                <span class="crm-col-count" id="cnt-nuevo">0</span>
+              </div>
+              <div class="crm-cards" id="cards-nuevo"></div>
+            </div>
+
+            <div class="crm-col" id="crm-col-contactado">
+              <div class="crm-col-header">
+                <span class="crm-col-dot" style="background:#3a7fff;"></span>
+                CONTACTADO
+                <span class="crm-col-count" id="cnt-contactado">0</span>
+              </div>
+              <div class="crm-cards" id="cards-contactado"></div>
+            </div>
+
+            <div class="crm-col" id="crm-col-demo">
+              <div class="crm-col-header">
+                <span class="crm-col-dot" style="background:#f59e0b;"></span>
+                DEMO / REUNIÓN
+                <span class="crm-col-count" id="cnt-demo">0</span>
+              </div>
+              <div class="crm-cards" id="cards-demo"></div>
+            </div>
+
+            <div class="crm-col" id="crm-col-propuesta">
+              <div class="crm-col-header">
+                <span class="crm-col-dot" style="background:#a855f7;"></span>
+                PROPUESTA
+                <span class="crm-col-count" id="cnt-propuesta">0</span>
+              </div>
+              <div class="crm-cards" id="cards-propuesta"></div>
+            </div>
+
+            <div class="crm-col" id="crm-col-cerrado">
+              <div class="crm-col-header">
+                <span class="crm-col-dot" style="background:#1DB954;"></span>
+                CERRADO ✓
+                <span class="crm-col-count" id="cnt-cerrado">0</span>
+              </div>
+              <div class="crm-cards" id="cards-cerrado"></div>
+            </div>
+
+            <div class="crm-col" id="crm-col-perdido">
+              <div class="crm-col-header">
+                <span class="crm-col-dot" style="background:#ff4444;"></span>
+                PERDIDO
+                <span class="crm-col-count" id="cnt-perdido">0</span>
+              </div>
+              <div class="crm-cards" id="cards-perdido"></div>
+            </div>
+
+          </div>
+
+          <!-- Modal de notas -->
+          <div id="crm-modal" style="display:none;">
+            <div id="crm-modal-inner">
+              <div id="crm-modal-header">
+                <span id="crm-modal-titulo">CONTACTO</span>
+                <button id="crm-modal-cerrar">[ X ]</button>
+              </div>
+              <div id="crm-modal-info"></div>
+              <div id="crm-notas-lista"></div>
+              <div id="crm-nota-input-area">
+                <input type="text" id="crm-nota-input" class="crm-input" placeholder="Agregar nota de seguimiento..." />
+                <button id="btn-crm-nota">[ + NOTA ]</button>
+              </div>
+              <div id="crm-modal-mover">
+                <span class="crm-modal-label">MOVER A:</span>
+                <button class="btn-etapa" data-etapa="nuevo">NUEVO</button>
+                <button class="btn-etapa" data-etapa="contactado">CONTACTADO</button>
+                <button class="btn-etapa" data-etapa="demo">DEMO</button>
+                <button class="btn-etapa" data-etapa="propuesta">PROPUESTA</button>
+                <button class="btn-etapa" data-etapa="cerrado">CERRADO</button>
+                <button class="btn-etapa" data-etapa="perdido">PERDIDO</button>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <section id="sec-ajustes" class="section">
+          <div class="section-header">
+            <h2 class="section-title">[ AJUSTES ]</h2>
+          </div>
+          <div class="config-grupo">
+            <label>Nombre del asistente</label>
+            <input type="text" id="cfg-nombre-asistente" placeholder="Jarvis" />
+          </div>
+          <div class="config-grupo">
+            <label>Tu nombre</label>
+            <input type="text" id="cfg-nombre-usuario" placeholder="Tu nombre" />
+          </div>
+          <div class="config-grupo">
+            <label>Color del tema</label>
+            <div id="cfg-colores">
+              <div class="color-opcion" data-color="#00d4ff" style="background:#00d4ff;"></div>
+              <div class="color-opcion" data-color="#00ff41" style="background:#00ff41;"></div>
+              <div class="color-opcion" data-color="#a855f7" style="background:#a855f7;"></div>
+              <div class="color-opcion" data-color="#ef4444" style="background:#ef4444;"></div>
+              <div class="color-opcion" data-color="#f59e0b" style="background:#f59e0b;"></div>
+              <div class="color-opcion" data-color="#d4af37" style="background:#d4af37;"></div>
+            </div>
+          </div>
+          <div class="config-grupo">
+            <label>Velocidad de voz: <span id="cfg-velocidad-val">1.0</span></label>
+            <input type="range" id="cfg-velocidad" min="0.5" max="2" step="0.1" value="1.0" />
+          </div>
+          <div class="config-grupo">
+            <label>Sector para Daily Briefing</label>
+            <input type="text" id="cfg-briefing-sector" placeholder="ej: tecnología, inmobiliaria, startups" />
+          </div>
+          <div class="config-grupo">
+            <button id="cfg-borrar-memoria" class="btn-peligro">[ RESET MEM ]</button>
+          </div>
+          <button id="cfg-guardar">[ GUARDAR ]</button>
+        </section>
+
       </div>
-      <div id="status-indicator">
-        <div id="status-dot"></div>
-        <span id="status-text">En línea</span>
-      </div>
-      <div id="status-sub">Listo para ayudarte</div>
-      <p id="response"></p>
-    </div>
+    </main>
 
-    <!-- Daily Briefing Card -->
-    <div id="briefing-card">
-      <div class="panel-card-title">☀ DAILY BRIEFING</div>
-      <div id="briefing-fecha"></div>
-      <div id="briefing-contenido">Presiona el botón para generar tu briefing del día.</div>
-      <button id="btn-regenerar-briefing">[ ↻ GENERAR ]</button>
-    </div>
+    <!-- Panel derecho -->
+    <aside id="panel-derecho">
 
-    <div id="uso-card">
-      <div class="panel-card-title">USO HOY</div>
-      <div class="uso-item">
-        <div class="uso-label">
-          <span>Mensajes</span>
-          <span id="uso-mensajes-num">0 / ∞</span>
+      <div id="status-card">
+        <div id="status-card-title">JARVIS STATUS</div>
+        <div id="status-avatar-wrap">
+          <div id="status-ring"></div>
+          <div id="status-ring2"></div>
+          <div id="status-ring3"></div>
+          <span id="status-letter">J</span>
         </div>
-        <div class="uso-bar-wrap">
-          <div class="uso-bar" id="uso-mensajes-bar" style="width:0%"></div>
+        <div id="status-indicator">
+          <div id="status-dot"></div>
+          <span id="status-text">En línea</span>
+        </div>
+        <div id="status-sub">Listo para ayudarte</div>
+        <p id="response"></p>
+      </div>
+
+      <!-- Daily Briefing Card -->
+      <div id="briefing-card">
+        <div class="panel-card-title">☀ DAILY BRIEFING</div>
+        <div id="briefing-fecha"></div>
+        <div id="briefing-contenido">Presiona el botón para generar tu briefing del día.</div>
+        <button id="btn-regenerar-briefing">[ ↻ GENERAR ]</button>
+      </div>
+
+      <div id="uso-card">
+        <div class="panel-card-title">USO HOY</div>
+        <div class="uso-item">
+          <div class="uso-label">
+            <span>Mensajes</span>
+            <span id="uso-mensajes-num">0 / ∞</span>
+          </div>
+          <div class="uso-bar-wrap">
+            <div class="uso-bar" id="uso-mensajes-bar" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="uso-item">
+          <div class="uso-label">
+            <span>Imágenes</span>
+            <span id="uso-imagenes-num">0 / 50</span>
+          </div>
+          <div class="uso-bar-wrap">
+            <div class="uso-bar" id="uso-imagenes-bar" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="uso-item">
+          <div class="uso-label">
+            <span>Búsquedas</span>
+            <span id="uso-busquedas-num">0 / 100</span>
+          </div>
+          <div class="uso-bar-wrap">
+            <div class="uso-bar" id="uso-busquedas-bar" style="width:0%"></div>
+          </div>
         </div>
       </div>
-      <div class="uso-item">
-        <div class="uso-label">
-          <span>Imágenes</span>
-          <span id="uso-imagenes-num">0 / 50</span>
-        </div>
-        <div class="uso-bar-wrap">
-          <div class="uso-bar" id="uso-imagenes-bar" style="width:0%"></div>
+
+      <div id="actividad-card">
+        <div class="panel-card-title">ACTIVIDAD RECIENTE</div>
+        <div id="actividad-lista"></div>
+      </div>
+
+      <div id="integraciones-card">
+        <div class="panel-card-title">INTEGRACIONES</div>
+        <div id="integraciones-lista">
+          <div class="integracion-item">
+            <div class="integracion-nombre">Groq / LLaMA</div>
+            <div class="integracion-status connected">● Conectado</div>
+          </div>
+          <div class="integracion-item">
+            <div class="integracion-nombre">Tavily AI</div>
+            <div class="integracion-status" id="status-tavily">○ Cargando...</div>
+          </div>
+          <div class="integracion-item">
+            <div class="integracion-nombre">Gemini Vision</div>
+            <div class="integracion-status connected">● Conectado</div>
+          </div>
+          <div class="integracion-item">
+            <div class="integracion-nombre">ElevenLabs</div>
+            <div class="integracion-status" id="status-eleven">● Conectado</div>
+          </div>
+          <div class="integracion-item">
+            <div class="integracion-nombre">Spotify</div>
+            <div class="integracion-status" id="status-spotify">○ Desconectado</div>
+          </div>
         </div>
       </div>
-      <div class="uso-item">
-        <div class="uso-label">
-          <span>Búsquedas</span>
-          <span id="uso-busquedas-num">0 / 100</span>
-        </div>
-        <div class="uso-bar-wrap">
-          <div class="uso-bar" id="uso-busquedas-bar" style="width:0%"></div>
-        </div>
-      </div>
-    </div>
 
-    <div id="actividad-card">
-      <div class="panel-card-title">ACTIVIDAD RECIENTE</div>
-      <div id="actividad-lista"></div>
-    </div>
-
-    <div id="integraciones-card">
-      <div class="panel-card-title">INTEGRACIONES</div>
-      <div id="integraciones-lista">
-        <div class="integracion-item">
-          <div class="integracion-nombre">Groq / LLaMA</div>
-          <div class="integracion-status connected">● Conectado</div>
-        </div>
-        <div class="integracion-item">
-          <div class="integracion-nombre">Tavily AI</div>
-          <div class="integracion-status" id="status-tavily">○ Cargando...</div>
-        </div>
-        <div class="integracion-item">
-          <div class="integracion-nombre">Gemini Vision</div>
-          <div class="integracion-status connected">● Conectado</div>
-        </div>
-        <div class="integracion-item">
-          <div class="integracion-nombre">ElevenLabs</div>
-          <div class="integracion-status" id="status-eleven">● Conectado</div>
-        </div>
-        <div class="integracion-item">
-          <div class="integracion-nombre">Spotify</div>
-          <div class="integracion-status" id="status-spotify">○ Desconectado</div>
-        </div>
-      </div>
-    </div>
-
-  </aside>
+    </aside>
 
   </div>
 
